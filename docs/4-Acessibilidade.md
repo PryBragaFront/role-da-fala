@@ -1,4 +1,4 @@
-# Acessibilidade
+# 4. Acessibilidade
 
 A acessibilidade não é um recurso extra do Rolê da Fala: é a primeira pergunta do cadastro. A pessoa escolhe, de forma opcional e privada, o apoio de que precisa, e a interface muda imediatamente. A escolha pode ser alterada a qualquer momento no perfil e nunca sai do aparelho.
 

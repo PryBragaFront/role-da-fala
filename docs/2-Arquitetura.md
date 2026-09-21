@@ -1,4 +1,4 @@
-# Arquitetura
+# 2. Arquitetura
 
 O projeto tem quatro partes. O coração é a biblioteca de domínio em C#, onde vivem as classes; tudo o mais existe para servi-la ou para exibi-la.
 

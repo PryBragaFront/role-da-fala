@@ -1,4 +1,4 @@
-# Regras do grupo
+# 5. Regras do Grupo
 
 Estas regras vieram do documento escrito pelo grupo quando o grupo de estudos nasceu. Elas estão dentro do app, na tela "Regras", e valem também para este repositório.
 

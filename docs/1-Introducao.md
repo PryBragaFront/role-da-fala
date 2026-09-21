@@ -1,10 +1,10 @@
-# O projeto
+# 1. Introdução
 
 ## Visão geral
 
 O Rolê da Fala é um protótipo clicável e bilíngue (português e inglês) de um app para praticar idiomas, começando pelo inglês, pensado para uso em comunidades e favelas. Funciona no celular, dá prioridade ao áudio e usa o português como apoio.
 
-A ideia é da Pricilla Lopes Braga: reunir estudantes para estudar juntos e trocar conhecimento. O grupo foi melhorando a proposta em conversa, escreveu um documento com as regras de convivência e, a partir dele, decidiu transformar a ideia em um app.
+A ideia inicial é da Pricilla Lopes Braga: reunir estudantes para estudar juntos e trocar conhecimento. O grupo foi melhorando a proposta em conversa, escreveu um documento com as regras de convivência e, a partir dele, decidiu transformar a ideia em um app.
 
 ## Problema
 
@@ -20,7 +20,7 @@ Boa parte dos apps de idiomas consome muitos dados, supõe leitura fluente em in
 
 ## Público
 
-Pessoas que moram em comunidades e vilas, de qualquer nível de inglês, inclusive quem nunca estudou. Também pessoas com deficiência ou dificuldades de aprendizagem: cegueira, baixa visão, dislexia, TDAH, autismo e surdez.
+Pessoas que moram em comunidades e vilas, de qualquer nível de inglês, inclusive quem nunca estudou. Também pessoas com deficiência ou dificuldades de aprendizagem: cegueira, baixa visão, dislexia, TDAH, autismo e surdez entre outros transtornos neurodivergentes.
 
 Quem está começando não precisa ler nada em inglês: o app oferece um nível 0, antes do iniciante, baseado em ouvir, ver figuras e repetir.
 
@@ -42,4 +42,5 @@ Quem está começando não precisa ler nada em inglês: o app oferece um nível 
 
 ## Autoria
 
-Participam do projeto, por enquanto, em ordem alfabética: Davi Alves Silveira, Glendha Paulino Tolentino, Pricilla Lopes Braga e Welberthy Gustavo de Freitas Morais, com orientação do Professor Humberto Nigri. Não é um projeto institucional de nenhuma universidade.
+Participam do projeto inicialmente: Davi Alves Silveira, Glendha Paulino Tolentino, Pricilla Lopes Braga e Welberthy Gustavo de Freitas Morais,
+Com orientação do Professor Humberto Nigri 

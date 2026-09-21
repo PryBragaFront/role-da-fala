@@ -66,7 +66,7 @@ role-da-fala/
 └── docs/                        documentação do projeto
 ```
 
-O front fala apenas com a API em C#. A API não tem regra de negócio própria: ela traduz HTTP e delega ao domínio, que é onde vivem as classes. O detalhamento está em [`docs/arquitetura.md`](docs/arquitetura.md), e o mapa dos conceitos de POO em [`docs/poo.md`](docs/poo.md).
+O front fala apenas com a API em C#. A API não tem regra de negócio própria: ela traduz HTTP e delega ao domínio, que é onde vivem as classes. O detalhamento está em [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md), e o mapa dos conceitos de POO em [`docs/3-Modelagem-POO.md`](docs/3-Modelagem-POO.md).
 
 ## Como executar
 
@@ -139,17 +139,17 @@ O reconhecimento de voz acontece no navegador, não no servidor: economiza dados
 3. **Comunidade.** Salas, chamadas e moderação com pessoas reais.
 4. **Expansão.** Outros idiomas além do inglês.
 
-O backlog completo, com riscos e métricas, está em [`docs/roadmap.md`](docs/roadmap.md).
+O backlog completo, com riscos e métricas, está em [`docs/7-Roadmap-Conclusao.md`](docs/7-Roadmap-Conclusao.md).
 
 ## Documentação
 
-- [`docs/projeto.md`](docs/projeto.md) — visão geral, problema, público e objetivos
-- [`docs/arquitetura.md`](docs/arquitetura.md) — como as camadas se dividem, com diagramas
-- [`docs/poo.md`](docs/poo.md) — onde cada conceito de orientação a objetos está no código, com diagrama de classes
-- [`docs/roadmap.md`](docs/roadmap.md) — fases, backlog, riscos e métricas
-- [`docs/acessibilidade.md`](docs/acessibilidade.md) — decisões de acessibilidade
-- [`docs/demonstracao.md`](docs/demonstracao.md) — roteiro de apresentação
-- [`docs/regras-do-grupo.md`](docs/regras-do-grupo.md) — regras de convivência
+- [`docs/1-Introducao.md`](docs/1-Introducao.md) — visão geral, problema, público e objetivos
+- [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md) — como as camadas se dividem, com diagramas
+- [`docs/3-Modelagem-POO.md`](docs/3-Modelagem-POO.md) — onde cada conceito de orientação a objetos está no código, com diagrama de classes
+- [`docs/4-Acessibilidade.md`](docs/4-Acessibilidade.md) — decisões de acessibilidade
+- [`docs/5-Regras-do-Grupo.md`](docs/5-Regras-do-Grupo.md) — regras de convivência
+- [`docs/6-Demonstracao.md`](docs/6-Demonstracao.md) — roteiro de apresentação
+- [`docs/7-Roadmap-Conclusao.md`](docs/7-Roadmap-Conclusao.md) — fases, backlog, riscos e métricas
 
 Cada pasta de código tem o seu próprio README: [frontend](frontend/README.md) e [ai-service](ai-service/README.md).
 

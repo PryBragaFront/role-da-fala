@@ -1,4 +1,4 @@
-# Roteiro de demonstração
+# 6. Demonstração
 
 Roteiro de cerca de 5 minutos. Abra o `frontend/index.html` no Chrome, no celular ou no computador, com o som ligado.
 
