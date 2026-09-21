@@ -3,8 +3,6 @@ using RoleDaFala.Dominio.Acessibilidade;
 using RoleDaFala.Dominio.Entidades;
 using RoleDaFala.Dominio.Excecoes;
 using RoleDaFala.Dominio.Repositorios;
-// Alias necessário: o SDK Web traz "using System.Threading" implícito, que também tem uma classe Monitor.
-using Monitor = RoleDaFala.Dominio.Entidades.Monitor;
 
 namespace RoleDaFala.Api.Servicos;
 

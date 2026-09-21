@@ -23,14 +23,12 @@ builder.Services.AddSwaggerGen(o => o.AddSecurityDefinition("Bearer", new()
 
 // INJEÇÃO DE DEPENDÊNCIA: a API registra qual implementação usar.
 // Os controllers e os serviços pedem a interface, nunca a classe concreta.
-builder.Services.AddSingleton<IParticipanteRepositorio, ParticipanteRepositorioEmMemoria>();
-builder.Services.AddSingleton<IRepositorio<Atividade>, RepositorioEmMemoria<Atividade>>();
-
-// Conta é a primeira entidade a sair da memória: login precisa sobreviver
-// a reiniciar a API. Participante e Atividade continuam em memória por
-// enquanto (ver "Próximos passos" em docs/2-Arquitetura.md).
+// As três entidades agora são gravadas no SQLite (ver Persistencia/); trocar
+// de volta para memória é só apontar para *RepositorioEmMemoria de novo.
 builder.Services.AddDbContext<RoleDaFalaDbContext>(o =>
     o.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddScoped<IParticipanteRepositorio, ParticipanteRepositorioSqlite>();
+builder.Services.AddScoped<IRepositorio<Atividade>, AtividadeRepositorioSqlite>();
 builder.Services.AddScoped<IContaRepositorio, ContaRepositorioSqlite>();
 builder.Services.AddScoped<TokenServico>();
 builder.Services.AddScoped<IContaServico, ContaServico>();
@@ -67,16 +65,20 @@ builder.Services.AddCors(o => o.AddPolicy(CorsFront, p => p
 
 var app = builder.Build();
 
-// Cria o banco (Contas) se ainda não existir. Um projeto real usaria
-// migrations (dotnet ef migrations); aqui isso ainda seria cedo demais.
+// Cria as tabelas se ainda não existirem. Um projeto real usaria migrations
+// (dotnet ef migrations); aqui isso ainda seria cedo demais.
+// Os repositórios agora dependem do DbContext (Scoped), então este bloco e a
+// carga inicial precisam rodar dentro de um escopo — não dá para pedir um
+// serviço Scoped direto ao app.Services (o provedor raiz).
 using (var escopo = app.Services.CreateScope())
 {
     var db = escopo.ServiceProvider.GetRequiredService<RoleDaFalaDbContext>();
     await db.Database.EnsureCreatedAsync();
-}
 
-// Conteúdo inicial: as 12 figuras do protótipo.
-await CargaInicial.ExecutarAsync(app.Services);
+    // Conteúdo inicial: as 12 figuras do protótipo (só na primeira vez;
+    // CargaInicial não insere de novo se a tabela já tiver dados).
+    await CargaInicial.ExecutarAsync(escopo.ServiceProvider);
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -91,6 +93,3 @@ app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.Run();
-
-/// <summary>Torna a classe visível para o projeto de testes.</summary>
-public partial class Program { }

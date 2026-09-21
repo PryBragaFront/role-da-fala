@@ -57,12 +57,10 @@ public class ContaServico : IContaServico
 
         if (participante is null)
         {
-            // O participante vive em memória e pode ter sumido num reinício da API;
-            // a conta persiste no SQLite, mas ainda não há dados persistidos para ela.
-            // Isso é resolvido na próxima etapa, quando Participante também for para o banco.
-            throw new DominioException(
-                "A conta existe, mas os dados do participante foram perdidos num reinício do servidor. " +
-                "Cadastre-se novamente — isso deixará de acontecer quando o participante também for salvo no banco.");
+            // Não deveria acontecer: participante e conta são criados juntos em
+            // RegistrarAsync, e os dois agora são persistidos. Só chegaria aqui
+            // se o participante fosse removido diretamente do banco.
+            throw new DominioException("A conta existe, mas o participante ligado a ela não foi encontrado.");
         }
 
         return new LoginResponse(_tokenServico.GerarToken(conta), participante);

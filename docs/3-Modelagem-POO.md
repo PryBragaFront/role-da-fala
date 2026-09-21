@@ -100,7 +100,9 @@ classDiagram
 
 **Por que `AvaliadorComSotaque` recebe outro avaliador em vez de herdar dele.** É o padrão Decorator, e a razão é prática: no futuro, o avaliador interno vai ser um serviço de fala de verdade. Com composição, basta trocar o que é passado no construtor. Com herança, seria preciso reescrever a classe.
 
-## Regras de negócio cobertas por teste
+## Regras de negócio a cobrir por teste
+
+O projeto de testes foi removido de propósito na mudança de arquitetura (ver [`docs/2-Arquitetura.md`](2-Arquitetura.md#próximos-passos)) e será reescrito do zero. Esta lista é o que já valia antes e continua valendo — é o ponto de partida de quando os testes voltarem a existir:
 
 - Nome com menos de duas letras é recusado.
 - XP negativo é recusado.
@@ -112,11 +114,4 @@ classDiagram
 - Atividade acima do nível da pessoa não pode ser respondida.
 - O avaliador com sotaque perdoa erros conhecidos e repassa o resto.
 - O controller devolve 201, 400 e 404 nos casos certos.
-
-## Rodando os testes
-
-```bash
-dotnet test
-```
-
-São 58 métodos de teste (56 `[Fact]` e 2 `[Theory]`), divididos entre o domínio e a API. Com os casos de `[InlineData]`, o total executado é 63.
+- Novas, a partir desta etapa: e-mail inválido ou duplicado é recusado na conta; login com senha errada não autentica.

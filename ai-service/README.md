@@ -64,12 +64,7 @@ Regras por enquanto (ver `app/inclusao.py`), não um modelo de linguagem — os 
 
 ## Testes
 
-```bash
-pip install -r requirements-dev.txt
-pytest
-```
-
-O projeto de testes foi zerado de propósito nesta etapa (ver [`docs/2-Arquitetura.md`](../docs/2-Arquitetura.md#próximos-passos)), para ser reescrito depois da mudança de arquitetura.
+Não há testes por enquanto: foram removidos de propósito nesta etapa (ver [`docs/2-Arquitetura.md`](../docs/2-Arquitetura.md#próximos-passos)), para serem recriados do zero depois da mudança de arquitetura. Quando isso acontecer, `pytest` volta a ser a ferramenta (basta reinstalar como dependência de desenvolvimento).
 
 ## Limitação importante
 

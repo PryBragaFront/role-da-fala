@@ -54,15 +54,13 @@ No cadastro a pessoa escolhe, de forma opcional e privada, o apoio de que precis
 
 ## Estrutura do repositório
 
-O projeto usa três linguagens, uma por camada:
-
 ```
 role-da-fala/
-├── frontend/                    HTML, CSS e JavaScript — a tela do app
+├── frontend/                    HTML, CSS e JavaScript — a tela do protótipo web
+├── android/                     Kotlin/Compose — esqueleto do app Android (ver android/README.md)
 ├── src/
 │   ├── RoleDaFala.Dominio/      C# — as classes do domínio (o núcleo de POO)
 │   └── RoleDaFala.Api/          C# — controllers, serviços, DTOs e persistência (SQLite)
-├── tests/RoleDaFala.Testes/     C# — projeto de testes com xUnit (zerado, a escrever de novo)
 ├── ai-service/                  Python (FastAPI) — correção de texto e adaptação de acessibilidade
 └── docs/                        documentação do projeto
 ```
@@ -103,7 +101,7 @@ dotnet run --project src/RoleDaFala.Api
 # API em http://localhost:5080, Swagger em http://localhost:5080/swagger
 ```
 
-As 15 atividades iniciais são criadas quando a API sobe. Na primeira execução, a API também cria o arquivo `roledafala.db` (SQLite) com a tabela de contas de login.
+Na primeira execução, a API cria o arquivo `roledafala.db` (SQLite) com as tabelas de contas, participantes e atividades — e semeia as 15 atividades iniciais. Nas próximas vezes, os dados continuam de onde pararam.
 
 Para cadastrar e entrar:
 
@@ -119,12 +117,7 @@ Cada chamada devolve um token JWT e os dados do participante.
 
 ### Testes
 
-O projeto de testes foi zerado de propósito (ver [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md#próximos-passos)) para ser reescrito depois da mudança de arquitetura. Por enquanto:
-
-```bash
-dotnet test                 # projeto compila, 0 testes
-cd ai-service && pip install -r requirements-dev.txt && pytest   # 0 testes
-```
+Não há projeto de testes por enquanto: foi removido de propósito (ver [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md#próximos-passos)) para ser recriado do zero depois da mudança de arquitetura, em vez de herdar suposições do desenho anterior.
 
 ## Tecnologia
 
@@ -132,15 +125,14 @@ cd ai-service && pip install -r requirements-dev.txt && pytest   # 0 testes
 | --- | --- | --- |
 | Front | HTML, CSS e JavaScript | Arquivo único, sem framework e sem build. Fala do app pela `SpeechSynthesis` e reconhecimento pela `SpeechRecognition` do navegador. Figuras em SVG desenhadas em código. |
 | Domínio | C# (.NET 8) | Biblioteca de classes pura, sem dependência de framework. Classes abstratas, herança, polimorfismo, interfaces e genéricos. |
-| API | C# (.NET 8) | ASP.NET Core Web API com controllers, injeção de dependência, DTOs, Swagger, autenticação JWT e Entity Framework Core (SQLite) para as contas de login. |
-| Testes | C# e Python | xUnit no C# e pytest no Python — projetos zerados, prontos para receber os testes de novo. |
+| API | C# (.NET 8) | ASP.NET Core Web API com controllers, injeção de dependência, DTOs, Swagger, autenticação JWT e Entity Framework Core (SQLite) para contas, participantes e atividades. |
 | Serviço auxiliar | Python 3.11+ | FastAPI para correção de texto e adaptação de conteúdo por perfil de acessibilidade. Sem estado próprio; quem guarda dado é a API em C#. |
 
 O reconhecimento de voz acontece no navegador, não no servidor: economiza dados e evita enviar áudio pela rede, o que importa muito para o público do app.
 
 ## Limitações
 
-- O e-mail e a senha da conta ficam salvos (SQLite), mas o restante do progresso (nome, XP, nível, apoios) ainda vive em memória: reiniciar a API apaga isso, embora a conta continue existindo. Levar o participante para o banco também é o próximo passo — ver [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md#próximos-passos).
+- Contas, participantes e atividades já ficam salvos (SQLite) e sobrevivem a reiniciar a API. Ainda não há migrations de verdade (`dotnet ef migrations`) nem versionamento do esquema — ver [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md#próximos-passos).
 - Não há chamadas reais entre pessoas nem moderação.
 - O app Android ainda não existe: por enquanto só a API em C# está pronta para atendê-lo.
 - O tutor de IA e as notas de pronúncia são simulados quando o navegador não oferece reconhecimento de voz.
@@ -167,7 +159,7 @@ O backlog completo, com riscos e métricas, está em [`docs/7-Roadmap-Conclusao.
 - [`docs/6-Demonstracao.md`](docs/6-Demonstracao.md) — roteiro de apresentação
 - [`docs/7-Roadmap-Conclusao.md`](docs/7-Roadmap-Conclusao.md) — fases, backlog, riscos e métricas
 
-Cada pasta de código tem o seu próprio README: [frontend](frontend/README.md) e [ai-service](ai-service/README.md).
+Cada pasta de código tem o seu próprio README: [frontend](frontend/README.md), [ai-service](ai-service/README.md) e [android](android/README.md).
 
 ## Como contribuir
 

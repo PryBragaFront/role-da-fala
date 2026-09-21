@@ -21,7 +21,8 @@ public abstract class Entidade
 
     /// <summary>
     /// Só o repositório atribui o Id, depois de gravar.
-    /// 'internal' limita o acesso ao próprio projeto.
+    /// 'internal' limita o acesso ao próprio projeto (e à API, ver InternalsVisibleTo
+    /// no .csproj do domínio) — é quem monta a entidade de volta ao ler do banco.
     /// </summary>
     internal void DefinirId(int id)
     {
@@ -32,6 +33,9 @@ public abstract class Entidade
 
         Id = id;
     }
+
+    /// <summary>Usado só ao reconstruir uma entidade a partir do banco, para manter a data original.</summary>
+    internal void DefinirCriadoEm(DateTime criadoEm) => CriadoEm = criadoEm;
 
     /// <summary>
     /// Duas entidades com o mesmo Id são a mesma coisa, mesmo em objetos diferentes.

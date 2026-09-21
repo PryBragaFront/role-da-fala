@@ -7,4 +7,9 @@
     <RootNamespace>RoleDaFala.Dominio</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- A API precisa reconstruir Id e CriadoEm ao ler uma entidade do banco. -->
+    <InternalsVisibleTo Include="RoleDaFala.Api" />
+  </ItemGroup>
+
 </Project>

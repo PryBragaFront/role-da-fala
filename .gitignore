@@ -43,3 +43,14 @@ venv/
 TestResults/
 *.trx
 .vs/
+
+# Android / Gradle
+android/local.properties
+android/.gradle/
+android/.idea/
+android/*/build/
+android/captures/
+*.apk
+*.aab
+*.jks
+*.keystore

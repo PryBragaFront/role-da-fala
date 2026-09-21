@@ -6,9 +6,7 @@ O projeto tem quatro partes. O coração é a biblioteca de domínio em C#, onde
 flowchart LR
     A["Front<br/>HTML, CSS, JS"] -->|HTTP JSON| B["API<br/>C# ASP.NET Core"]
     B --> C["Domínio<br/>C# biblioteca de classes"]
-    B --> F[("SQLite<br/>contas de login")]
-    D["Testes<br/>xUnit"] --> C
-    D --> B
+    B --> F[("SQLite<br/>contas, participantes, atividades")]
     B -.->|opcional| E["Correção e adaptação<br/>Python FastAPI"]
 ```
 
@@ -28,8 +26,7 @@ A API, em `src/RoleDaFala.Api`, faz três coisas e só: recebe a requisição HT
 | Aplicação | `src/RoleDaFala.Api/Servicos` | Orquestra o domínio e converte entidade em DTO |
 | Apresentação | `src/RoleDaFala.Api/Controllers` | Traduz HTTP: rota, status e formato |
 | Interface | `frontend/` | As telas, a voz e a acessibilidade |
-| Persistência | `src/RoleDaFala.Api/Persistencia` | Fala com o SQLite (por enquanto, só as contas de login) |
-| Testes | `tests/RoleDaFala.Testes` | Zerado de propósito, a reescrever após esta mudança de arquitetura |
+| Persistência | `src/RoleDaFala.Api/Persistencia` | Fala com o SQLite: contas, participantes e atividades |
 
 A dependência aponta sempre para dentro: o controller conhece o serviço, o serviço conhece o domínio, e o domínio não conhece ninguém.
 
@@ -38,12 +35,12 @@ A dependência aponta sempre para dentro: o controller conhece o serviço, o ser
 O `Program.cs` é o único lugar que decide qual implementação usar:
 
 ```csharp
-builder.Services.AddSingleton<IParticipanteRepositorio, ParticipanteRepositorioEmMemoria>();
+builder.Services.AddScoped<IParticipanteRepositorio, ParticipanteRepositorioSqlite>();
 builder.Services.AddSingleton<IAvaliador>(_ =>
     new AvaliadorComSotaque(new AvaliadorPorSemelhanca()));
 ```
 
-Nenhuma outra classe dá `new` num repositório ou num avaliador: todas recebem a interface pelo construtor. É isso que permite os testes trocarem o repositório real por um em memória sem alterar uma linha do serviço.
+Nenhuma outra classe dá `new` num repositório ou num avaliador: todas recebem a interface pelo construtor. `RoleDaFala.Dominio.Repositorios.ParticipanteRepositorioEmMemoria` e `RepositorioEmMemoria<T>` continuam existindo, prontos e funcionais, exatamente por causa disso — trocar de volta para rodar sem banco (ou para quando os testes voltarem a existir) é mudar esta linha, nada mais.
 
 ## Fluxo de uma tentativa de pronúncia
 
@@ -89,11 +86,11 @@ Com a API rodando, a documentação interativa fica em `http://localhost:5080/sw
 
 ## Contas e autenticação
 
-Diferente de participante e atividade, a conta de login (e-mail e hash de senha) é gravada de verdade num banco SQLite (`src/RoleDaFala.Api/roledafala.db`, ignorado pelo Git) — ela precisa sobreviver a reiniciar a API. A senha nunca é guardada em texto puro: `Dominio/Seguranca/HashDeSenha.cs` deriva um hash com PBKDF2, só com a biblioteca padrão do .NET.
+A conta de login (e-mail e hash de senha) é gravada num banco SQLite (`src/RoleDaFala.Api/roledafala.db`, ignorado pelo Git) — assim como participante e atividade agora, ela sobrevive a reiniciar a API. A senha nunca é guardada em texto puro: `Dominio/Seguranca/HashDeSenha.cs` deriva um hash com PBKDF2, só com a biblioteca padrão do .NET.
 
 Depois de `/contas/login` ou `/contas/registrar`, a API devolve um token JWT. É o mesmo token que servirá tanto para o front web quanto, futuramente, para o app Android — nenhum dos dois vai depender de cookie de navegador.
 
-`Conta` é uma entidade separada de `Participante` de propósito: uma é "como a pessoa entra", a outra é "quem ela é no app". Hoje `ParticipanteId` liga as duas, mas como o participante ainda vive em memória, uma conta pode sobreviver a um reinício da API enquanto o participante ligado a ela não — ver [Próximos passos](#próximos-passos).
+`Conta` é uma entidade separada de `Participante` de propósito: uma é "como a pessoa entra", a outra é "quem ela é no app". `ParticipanteId` liga as duas; hoje isso não é uma foreign key de verdade no banco (ver [Próximos passos](#próximos-passos)), então apagar um participante direto no banco deixaria a conta órfã — o `ContaServico.LoginAsync` detecta esse caso e devolve um erro claro em vez de quebrar.
 
 ## O serviço em Python
 
@@ -113,7 +110,9 @@ Ele fica como demonstração de integração entre serviços e como o lugar natu
 
 **Por que controllers e não minimal API.** Controllers deixam explícitas as camadas, os atributos de rota e os códigos de resposta, e são mais fáceis de testar em isolamento. Como a API entra na avaliação, a clareza vale mais que a brevidade.
 
-**Por que repositório em memória (para participante e atividade).** Para rodar sem instalar banco: clonar e dar `dotnet run` basta. `Conta` já mostra como é a troca por Entity Framework com SQLite: uma nova classe que implementa a interface do repositório (`ContaRepositorioSqlite : IContaRepositorio`) e algumas linhas no `Program.cs`. Nada no domínio muda, e é justamente isso que a interface garante — o mesmo caminho serve para levar participante e atividade ao banco depois.
+**Por que repositório em memória existia (e ainda existe como opção).** Para rodar sem instalar banco bastava clonar e dar `dotnet run`. `Conta` foi a primeira a trocar para Entity Framework com SQLite — uma nova classe implementando a interface do repositório (`ContaRepositorioSqlite : IContaRepositorio`) e algumas linhas no `Program.cs`, sem tocar no domínio — e participante e atividade seguiram o mesmo caminho logo depois. `ParticipanteRepositorioEmMemoria` e `RepositorioEmMemoria<T>` continuam no domínio, então voltar a rodar sem banco é só trocar de novo a linha do `Program.cs`.
+
+**Por que Participante e Atividade não são mapeados direto pelo EF Core.** As duas classes escondem seu estado de propósito (Xp e DiasSeguidos só mudam por `GanharXp`/`RegistrarPresenca`; `Enunciado` e as respostas aceitas nem têm setter) — é o núcleo de POO do projeto, e forçar o EF Core a violar isso (expondo setters públicos só para o banco conseguir gravar) estragaria o motivo de a classe existir. Em vez disso, `ParticipanteRegistro` e `AtividadeRegistro` (em `Persistencia/`) são o formato "achatado" que vai para o SQLite, e `ParticipanteRepositorioSqlite`/`AtividadeRepositorioSqlite` convertem nos dois sentidos — para reconstruir a entidade ao ler do banco, eles chamam os mesmos métodos públicos que qualquer outro código usaria (`GanharXp`, `RegistrarPresenca`, `Acessibilidade.Adicionar`...), nunca acessam campo privado.
 
 **Por que a exceção do domínio vira 400 e não 500.** Nome vazio não é falha do servidor: é uso incorreto. O controller captura `DominioException` e devolve 400 com a mensagem, para o front poder mostrá-la à pessoa.
 
@@ -121,7 +120,10 @@ Ele fica como demonstração de integração entre serviços e como o lugar natu
 
 Combinado após a primeira reunião de alinhamento do grupo, ainda sujeito a mudar:
 
-- **Persistir participante e atividade.** Hoje só a conta de login está no SQLite; o resto reinicia com a API. É o que resolve a limitação descrita em [Contas e autenticação](#contas-e-autenticação).
-- **Android.** A API já fala JSON puro com JWT, então não deve exigir mudança para atender um app Android — a decisão de ir de WebView/PWA ou nativo ainda não foi tomada pelo grupo.
+- ~~Persistir participante e atividade~~ — feito: contas, participantes e atividades já gravam no SQLite.
+- **Migrations de verdade.** O banco hoje é criado com `EnsureCreatedAsync` (ver `Program.cs`), que cria as tabelas do zero mas não sabe evoluir um esquema já existente. O passo seguinte é `dotnet ef migrations add`, para versionar mudanças de schema em vez de recriar o banco.
+- **Chave JWT fora do código.** A chave em `appsettings.json` é só de desenvolvimento (está comentada como tal). Antes de qualquer uso real, mover para variável de ambiente ou `dotnet user-secrets`.
+- **Foreign key entre Conta e Participante.** Hoje `Conta.ParticipanteId` é só um número guardado, sem restrição no banco — ver [Contas e autenticação](#contas-e-autenticação).
+- **Android.** A API já fala JSON puro com JWT, então não deve exigir mudança para atender um app Android. O esqueleto do projeto Android está em `android/` (ver [`android/README.md`](../android/README.md)) — sem tela funcional ainda, só a estrutura para o time continuar depois da reunião.
 - **IA de adaptação de acessibilidade.** O endpoint `/adaptar` do `ai-service` começa como regra fixa (ver `app/inclusao.py`); a ideia é evoluir para um modelo de verdade, do mesmo jeito que já está planejado para a correção de texto.
-- **Testes.** Os projetos de teste (`tests/RoleDaFala.Testes` e `ai-service/tests`) foram zerados de propósito nesta mudança de arquitetura, para serem reescritos a partir do novo desenho, e não dos requisitos antigos.
+- **Testes.** Os projetos de teste (`tests/RoleDaFala.Testes` e `ai-service/tests`) foram removidos de propósito nesta mudança de arquitetura — inclusive a "casca" (`.csproj`, `pytest.ini`) — para serem recriados do zero a partir do novo desenho, e não dos requisitos antigos.
