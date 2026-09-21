@@ -10,9 +10,9 @@ Protótipo de aplicativo para praticar inglês em grupo, pensado para uso em com
 
 ## Autoria
 
-A ideia é da **Pricilla Braga**: reunir estudantes para estudar juntos e trocar conhecimento. O grupo evoluiu em conversa, escreveu o documento com as regras de convivência e, a partir dele, decidiu transformar a ideia em um app.
+A ideia é da **Pricilla Lopes Braga**: reunir estudantes para estudar juntos e trocar conhecimento. O grupo evoluiu em conversa, escreveu o documento com as regras de convivência e, a partir dele, decidiu transformar a ideia em um app.
 
-Participam do projeto, por enquanto, em ordem alfabética: **Davi Alves**, **Glendha Paulino**, **Pricilla Braga** e **Welberthy Gustavo de Freitas Morais**.
+Participam do projeto, por enquanto, em ordem alfabética: **Davi Alves Silveira**, **Glendha Paulino Tolentino**, **Pricilla Lopes Braga** e **Welberthy Gustavo de Freitas Morais**, com orientação do **Professor Humberto Nigri**.
 
 Este não é um projeto institucional de nenhuma universidade.
 
@@ -159,4 +159,4 @@ Leia o [guia de contribuição](CONTRIBUTING.md) e o [código de conduta](CODE_O
 
 ## Licença
 
-[MIT](LICENSE). Copyright (c) 2026 Davi Alves, Glendha Paulino, Pricilla Braga e Welberthy Gustavo de Freitas Morais.
+[MIT](LICENSE). Copyright (c) 2026 Davi Alves Silveira, Glendha Paulino Tolentino, Pricilla Lopes Braga e Welberthy Gustavo de Freitas Morais.

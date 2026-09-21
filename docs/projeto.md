@@ -4,7 +4,7 @@
 
 O Rolê da Fala é um protótipo clicável e bilíngue (português e inglês) de um app para praticar idiomas, começando pelo inglês, pensado para uso em comunidades e favelas. Funciona no celular, dá prioridade ao áudio e usa o português como apoio.
 
-A ideia é da Pricilla Braga: reunir estudantes para estudar juntos e trocar conhecimento. O grupo foi melhorando a proposta em conversa, escreveu um documento com as regras de convivência e, a partir dele, decidiu transformar a ideia em um app.
+A ideia é da Pricilla Lopes Braga: reunir estudantes para estudar juntos e trocar conhecimento. O grupo foi melhorando a proposta em conversa, escreveu um documento com as regras de convivência e, a partir dele, decidiu transformar a ideia em um app.
 
 ## Problema
 
@@ -42,4 +42,4 @@ Quem está começando não precisa ler nada em inglês: o app oferece um nível 
 
 ## Autoria
 
-Participam do projeto, por enquanto, em ordem alfabética: Davi Alves, Glendha Paulino, Pricilla Braga e Welberthy Gustavo de Freitas Morais. Não é um projeto institucional de nenhuma universidade.
+Participam do projeto, por enquanto, em ordem alfabética: Davi Alves Silveira, Glendha Paulino Tolentino, Pricilla Lopes Braga e Welberthy Gustavo de Freitas Morais, com orientação do Professor Humberto Nigri. Não é um projeto institucional de nenhuma universidade.
