@@ -6,9 +6,10 @@ O projeto tem quatro partes. O coração é a biblioteca de domínio em C#, onde
 flowchart LR
     A["Front<br/>HTML, CSS, JS"] -->|HTTP JSON| B["API<br/>C# ASP.NET Core"]
     B --> C["Domínio<br/>C# biblioteca de classes"]
+    B --> F[("SQLite<br/>contas de login")]
     D["Testes<br/>xUnit"] --> C
     D --> B
-    B -.->|opcional| E["Correção de texto<br/>Python FastAPI"]
+    B -.->|opcional| E["Correção e adaptação<br/>Python FastAPI"]
 ```
 
 ## Por que separar domínio e API
@@ -27,7 +28,8 @@ A API, em `src/RoleDaFala.Api`, faz três coisas e só: recebe a requisição HT
 | Aplicação | `src/RoleDaFala.Api/Servicos` | Orquestra o domínio e converte entidade em DTO |
 | Apresentação | `src/RoleDaFala.Api/Controllers` | Traduz HTTP: rota, status e formato |
 | Interface | `frontend/` | As telas, a voz e a acessibilidade |
-| Testes | `tests/RoleDaFala.Testes` | 58 testes, do domínio e da API |
+| Persistência | `src/RoleDaFala.Api/Persistencia` | Fala com o SQLite (por enquanto, só as contas de login) |
+| Testes | `tests/RoleDaFala.Testes` | Zerado de propósito, a reescrever após esta mudança de arquitetura |
 
 A dependência aponta sempre para dentro: o controller conhece o serviço, o serviço conhece o domínio, e o domínio não conhece ninguém.
 
@@ -80,14 +82,24 @@ O reconhecimento de voz acontece no navegador, não no servidor. Isso economiza 
 | GET | `/atividades` | Lista as atividades |
 | GET | `/atividades?participanteId=1` | Lista só as disponíveis para aquela pessoa |
 | POST | `/atividades/{id}/responder` | Envia a resposta e recebe a nota |
+| POST | `/contas/registrar` | Cria o participante e a conta de login (e-mail e senha) numa só chamada |
+| POST | `/contas/login` | Confere e-mail e senha, devolve um token (JWT) e os dados do participante |
 
 Com a API rodando, a documentação interativa fica em `http://localhost:5080/swagger`.
 
+## Contas e autenticação
+
+Diferente de participante e atividade, a conta de login (e-mail e hash de senha) é gravada de verdade num banco SQLite (`src/RoleDaFala.Api/roledafala.db`, ignorado pelo Git) — ela precisa sobreviver a reiniciar a API. A senha nunca é guardada em texto puro: `Dominio/Seguranca/HashDeSenha.cs` deriva um hash com PBKDF2, só com a biblioteca padrão do .NET.
+
+Depois de `/contas/login` ou `/contas/registrar`, a API devolve um token JWT. É o mesmo token que servirá tanto para o front web quanto, futuramente, para o app Android — nenhum dos dois vai depender de cookie de navegador.
+
+`Conta` é uma entidade separada de `Participante` de propósito: uma é "como a pessoa entra", a outra é "quem ela é no app". Hoje `ParticipanteId` liga as duas, mas como o participante ainda vive em memória, uma conta pode sobreviver a um reinício da API enquanto o participante ligado a ela não — ver [Próximos passos](#próximos-passos).
+
 ## O serviço em Python
 
-O `ai-service/` continua no repositório, com a correção de frases escritas e os seus 11 testes. Ele é opcional: a API funciona sem ele, porque a avaliação de pronúncia foi levada para o domínio em C#, onde pode ser testada junto com as regras.
+O `ai-service/` cobre duas coisas, as duas simuladas por regras (não por um modelo de linguagem): a correção de frases escritas e, agora, a adaptação de conteúdo por perfil de acessibilidade (endpoint `/adaptar`, em `app/inclusao.py`). Ele é opcional: a API funciona sem ele, porque a avaliação de pronúncia foi levada para o domínio em C#, onde pode ser testada junto com as regras.
 
-Ele fica como demonstração de integração entre serviços e como o lugar natural para, na etapa 10, entrar um modelo de linguagem de verdade.
+Ele fica como demonstração de integração entre serviços e como o lugar natural para, mais adiante, entrar um modelo de linguagem de verdade — tanto para a correção quanto para a adaptação de acessibilidade.
 
 ## Portas
 
@@ -101,6 +113,15 @@ Ele fica como demonstração de integração entre serviços e como o lugar natu
 
 **Por que controllers e não minimal API.** Controllers deixam explícitas as camadas, os atributos de rota e os códigos de resposta, e são mais fáceis de testar em isolamento. Como a API entra na avaliação, a clareza vale mais que a brevidade.
 
-**Por que repositório em memória.** Para rodar sem instalar banco: clonar e dar `dotnet run` basta. A troca por Entity Framework com SQLite é uma nova classe que implementa `IRepositorio<T>` e uma linha no `Program.cs`. Nada mais muda, e é justamente isso que a interface garante.
+**Por que repositório em memória (para participante e atividade).** Para rodar sem instalar banco: clonar e dar `dotnet run` basta. `Conta` já mostra como é a troca por Entity Framework com SQLite: uma nova classe que implementa a interface do repositório (`ContaRepositorioSqlite : IContaRepositorio`) e algumas linhas no `Program.cs`. Nada no domínio muda, e é justamente isso que a interface garante — o mesmo caminho serve para levar participante e atividade ao banco depois.
 
 **Por que a exceção do domínio vira 400 e não 500.** Nome vazio não é falha do servidor: é uso incorreto. O controller captura `DominioException` e devolve 400 com a mensagem, para o front poder mostrá-la à pessoa.
+
+## Próximos passos
+
+Combinado após a primeira reunião de alinhamento do grupo, ainda sujeito a mudar:
+
+- **Persistir participante e atividade.** Hoje só a conta de login está no SQLite; o resto reinicia com a API. É o que resolve a limitação descrita em [Contas e autenticação](#contas-e-autenticação).
+- **Android.** A API já fala JSON puro com JWT, então não deve exigir mudança para atender um app Android — a decisão de ir de WebView/PWA ou nativo ainda não foi tomada pelo grupo.
+- **IA de adaptação de acessibilidade.** O endpoint `/adaptar` do `ai-service` começa como regra fixa (ver `app/inclusao.py`); a ideia é evoluir para um modelo de verdade, do mesmo jeito que já está planejado para a correção de texto.
+- **Testes.** Os projetos de teste (`tests/RoleDaFala.Testes` e `ai-service/tests`) foram zerados de propósito nesta mudança de arquitetura, para serem reescritos a partir do novo desenho, e não dos requisitos antigos.

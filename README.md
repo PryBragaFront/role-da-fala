@@ -31,6 +31,7 @@ O Rolê da Fala parte de três escolhas: o áudio vem primeiro, o português é 
 | Tutor IA – Figuras | Mostra uma imagem, a pessoa fala o nome em inglês e recebe nota de pronúncia e dica. São 12 figuras. |
 | Tutor IA – Conversas | Cenários guiados: cumprimentos, mercado, consulta médica, entrevista de emprego e debate. |
 | Tutor IA – Palavras | Cartões das palavras salvas para revisão. |
+| Login | E-mail e senha, criados no cadastro. A conta fica salva num banco (SQLite); o restante do progresso ainda não. |
 | Salas | Salas de prática e dicas da comunidade. |
 | Feedback | Speaking (áudio) e Writing (texto), com comentários de colegas. |
 | Desafios e Chamadas | Desafios, chamadas em dupla só por voz ou com vídeo, e rodas de conversa. |
@@ -60,9 +61,9 @@ role-da-fala/
 ├── frontend/                    HTML, CSS e JavaScript — a tela do app
 ├── src/
 │   ├── RoleDaFala.Dominio/      C# — as classes do domínio (o núcleo de POO)
-│   └── RoleDaFala.Api/          C# — controllers, serviços e DTOs
-├── tests/RoleDaFala.Testes/     C# — 58 testes com xUnit
-├── ai-service/                  Python (FastAPI) — correção de texto
+│   └── RoleDaFala.Api/          C# — controllers, serviços, DTOs e persistência (SQLite)
+├── tests/RoleDaFala.Testes/     C# — projeto de testes com xUnit (zerado, a escrever de novo)
+├── ai-service/                  Python (FastAPI) — correção de texto e adaptação de acessibilidade
 └── docs/                        documentação do projeto
 ```
 
@@ -102,13 +103,27 @@ dotnet run --project src/RoleDaFala.Api
 # API em http://localhost:5080, Swagger em http://localhost:5080/swagger
 ```
 
-As 15 atividades iniciais são criadas quando a API sobe.
+As 15 atividades iniciais são criadas quando a API sobe. Na primeira execução, a API também cria o arquivo `roledafala.db` (SQLite) com a tabela de contas de login.
+
+Para cadastrar e entrar:
+
+```bash
+curl -X POST http://localhost:5080/contas/registrar -H "Content-Type: application/json" \
+  -d '{"nome":"Ana","nivel":"Zero","apoios":[],"email":"ana@exemplo.com","senha":"minhasenha"}'
+
+curl -X POST http://localhost:5080/contas/login -H "Content-Type: application/json" \
+  -d '{"email":"ana@exemplo.com","senha":"minhasenha"}'
+```
+
+Cada chamada devolve um token JWT e os dados do participante.
 
 ### Testes
 
+O projeto de testes foi zerado de propósito (ver [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md#próximos-passos)) para ser reescrito depois da mudança de arquitetura. Por enquanto:
+
 ```bash
-dotnet test                 # 58 testes do domínio e da API
-cd ai-service && pip install -r requirements-dev.txt && pytest   # 11 testes
+dotnet test                 # projeto compila, 0 testes
+cd ai-service && pip install -r requirements-dev.txt && pytest   # 0 testes
 ```
 
 ## Tecnologia
@@ -117,16 +132,17 @@ cd ai-service && pip install -r requirements-dev.txt && pytest   # 11 testes
 | --- | --- | --- |
 | Front | HTML, CSS e JavaScript | Arquivo único, sem framework e sem build. Fala do app pela `SpeechSynthesis` e reconhecimento pela `SpeechRecognition` do navegador. Figuras em SVG desenhadas em código. |
 | Domínio | C# (.NET 8) | Biblioteca de classes pura, sem dependência de framework. Classes abstratas, herança, polimorfismo, interfaces e genéricos. |
-| API | C# (.NET 8) | ASP.NET Core Web API com controllers, injeção de dependência, DTOs e Swagger. |
-| Testes | C# e Python | xUnit no C# (58 testes) e pytest no Python (11 testes). |
-| Serviço auxiliar | Python 3.11+ | FastAPI para a correção de texto. Sem estado e sem banco. |
+| API | C# (.NET 8) | ASP.NET Core Web API com controllers, injeção de dependência, DTOs, Swagger, autenticação JWT e Entity Framework Core (SQLite) para as contas de login. |
+| Testes | C# e Python | xUnit no C# e pytest no Python — projetos zerados, prontos para receber os testes de novo. |
+| Serviço auxiliar | Python 3.11+ | FastAPI para correção de texto e adaptação de conteúdo por perfil de acessibilidade. Sem estado próprio; quem guarda dado é a API em C#. |
 
 O reconhecimento de voz acontece no navegador, não no servidor: economiza dados e evita enviar áudio pela rede, o que importa muito para o público do app.
 
 ## Limitações
 
-- Nada é salvo: ao recarregar a página, o cadastro e o progresso se perdem.
-- Não há contas, backend, chamadas reais entre pessoas nem moderação.
+- O e-mail e a senha da conta ficam salvos (SQLite), mas o restante do progresso (nome, XP, nível, apoios) ainda vive em memória: reiniciar a API apaga isso, embora a conta continue existindo. Levar o participante para o banco também é o próximo passo — ver [`docs/2-Arquitetura.md`](docs/2-Arquitetura.md#próximos-passos).
+- Não há chamadas reais entre pessoas nem moderação.
+- O app Android ainda não existe: por enquanto só a API em C# está pronta para atendê-lo.
 - O tutor de IA e as notas de pronúncia são simulados quando o navegador não oferece reconhecimento de voz.
 - Os pacotes offline são uma proposta de design; o uso sem internet ainda precisa ser construído.
 - Nomes, horários e comentários exibidos são fictícios.

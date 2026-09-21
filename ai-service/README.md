@@ -1,6 +1,6 @@
 # Serviço auxiliar (Python)
 
-Corrige frases escritas em inglês. É opcional: a API em C# funciona sem ele.
+Corrige frases escritas em inglês e adapta conteúdo ao perfil de acessibilidade. É opcional: a API em C# funciona sem ele.
 
 A avaliação de pronúncia ficou no domínio em C# (`AvaliadorPorSemelhanca` e `AvaliadorComSotaque`), para ser testada junto com as regras de negócio. Este serviço permanece como demonstração de integração entre serviços e é onde, na etapa 10, entraria um modelo de linguagem de verdade.
 
@@ -43,12 +43,33 @@ Documentação interativa em `http://localhost:8001/docs`.
 }
 ```
 
+### POST /adaptar
+
+```json
+{ "texto": "Responda rápido!", "apoios": ["Autismo"] }
+```
+
+```json
+{
+  "texto_original": "Responda rápido!",
+  "texto_adaptado": "Responda com calma!",
+  "prioridade_audio": false,
+  "precisa_alternativa_visual": false,
+  "sessao_curta": false,
+  "dicas": ["Linguagem de urgência suavizada para manter um ritmo previsível."]
+}
+```
+
+Regras por enquanto (ver `app/inclusao.py`), não um modelo de linguagem — os apoios aceitos são os mesmos do cadastro: `Cegueira`, `BaixaVisao`, `Dislexia`, `Tdah`, `Autismo`, `Surdez`.
+
 ## Testes
 
 ```bash
 pip install -r requirements-dev.txt
 pytest
 ```
+
+O projeto de testes foi zerado de propósito nesta etapa (ver [`docs/2-Arquitetura.md`](../docs/2-Arquitetura.md#próximos-passos)), para ser reescrito depois da mudança de arquitetura.
 
 ## Limitação importante
 

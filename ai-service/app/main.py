@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from app.inclusao import adaptar
 from app.pronuncia import avaliar
 from app.texto import corrigir
 
@@ -50,6 +51,24 @@ class CorrigirResponse(BaseModel):
     explicacoes: list[str]
 
 
+class AdaptarRequest(BaseModel):
+    texto: str = Field(..., description="Conteúdo original da atividade", examples=["Responda rápido!"])
+    apoios: list[str] = Field(
+        default_factory=list,
+        description="Apoios do perfil de acessibilidade (ex.: Dislexia, Tdah)",
+        examples=[["Dislexia", "Tdah"]],
+    )
+
+
+class AdaptarResponse(BaseModel):
+    texto_original: str
+    texto_adaptado: str
+    prioridade_audio: bool
+    precisa_alternativa_visual: bool
+    sessao_curta: bool
+    dicas: list[str]
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -65,3 +84,9 @@ def avaliar_pronuncia(req: AvaliarRequest) -> dict[str, object]:
 def corrigir_texto(req: CorrigirRequest) -> dict[str, object]:
     """Corrige erros comuns em uma frase curta."""
     return corrigir(req.texto)
+
+
+@app.post("/adaptar", response_model=AdaptarResponse)
+def adaptar_conteudo(req: AdaptarRequest) -> dict[str, object]:
+    """Adapta um texto ao perfil de acessibilidade informado."""
+    return adaptar(req.texto, req.apoios)

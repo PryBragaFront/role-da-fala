@@ -26,3 +26,15 @@ public record ResponderRequest(int ParticipanteId, string Resposta);
 public record ResultadoResponse(int Nota, string Mensagem, string Dica, bool Acertou, int XpAtual, string Nivel);
 
 public record ErroResponse(string Erro);
+
+public record RegistrarContaRequest(
+    string Nome,
+    string? Tipo,
+    string? Nivel,
+    string[]? Apoios,
+    string Email,
+    string Senha);
+
+public record LoginRequest(string Email, string Senha);
+
+public record LoginResponse(string Token, ParticipanteResponse Participante);
