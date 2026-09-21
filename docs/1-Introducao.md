@@ -2,8 +2,6 @@
 
 ## Visão geral
 
-## Introdução
-
 O Rolê da Fala nasceu de uma conversa entre Pricilla Braga e um grupo de amigos. Pricilla conduz, em uma casa de cultura da comunidade, um curso solidário de inglês baseado em conversação, e foi falando dessa experiência que surgiu a pergunta: como levar essa prática para além dos encontros presenciais, para quem não pode estar lá toda semana?
 
 Nos encontros, ficava claro que aprender inglês na comunidade tem desafios próprios. Muita gente quer praticar, mas esbarra em internet cara ou instável, celulares simples, pouco tempo livre e o receio de errar na frente dos outros. Ao mesmo tempo, o formato de conversa, com correção respeitosa e o português sempre disponível para tirar dúvidas, mostrava que é possível aprender sem medo quando o ambiente é acolhedor.
@@ -48,5 +46,4 @@ Quem está começando não precisa ler nada em inglês: o app oferece um nível 
 
 ## Autoria
 
-Participam do projeto inicialmente: Davi Alves Silveira, Glendha Paulino Tolentino, Pricilla Lopes Braga e Welberthy Gustavo de Freitas Morais,
-Com orientação do Professor Humberto Nigri 
+Participam do projeto inicialmente: Davi Alves Silveira, Glendha Paulino Tolentino, Pricilla Lopes Braga e Welberthy Gustavo de Freitas Morais, com orientação do Professor Humberto Nigri.
