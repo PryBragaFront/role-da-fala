@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Rolê da Fala: pratique inglês sozinho, em dupla ou em grupo, em qualquer celular e com pouco gasto de internet.">
+<title>Rolê da Fala</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&family=Lexend:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#EAF0F2; --surface:#FFFFFF; --surface2:#F3F7F8; --ink:#10262F; --ink2:#4B626C; --line:#D5E0E4;
+  --brand:#0F4C6B; --brand-ink:#FFFFFF; --accent:#E8702A; --accent-soft:#FDE9DB;
+  --ok:#1E8A5A; --ok-soft:#DDF3E8; --warn:#B7791F; --warn-soft:#FBEFD5; --bad:#B4372F; --bad-soft:#F9E1DE;
+  --shadow:0 10px 40px rgba(15,76,107,.18);
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Nunito Sans','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A171D; --surface:#12262F; --surface2:#182F3A; --ink:#EAF3F6; --ink2:#9DB4BE; --line:#26414D;
+    --brand:#5DB4DA; --brand-ink:#08222D; --accent:#FF9A57; --accent-soft:#3A2618;
+    --ok:#5AD09B; --ok-soft:#173A2C; --warn:#F0BE62; --warn-soft:#3B2E14; --bad:#FF8A80; --bad-soft:#3F1E1B;
+    --shadow:0 10px 40px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A171D; --surface:#12262F; --surface2:#182F3A; --ink:#EAF3F6; --ink2:#9DB4BE; --line:#26414D;
+  --brand:#5DB4DA; --brand-ink:#08222D; --accent:#FF9A57; --accent-soft:#3A2618;
+  --ok:#5AD09B; --ok-soft:#173A2C; --warn:#F0BE62; --warn-soft:#3B2E14; --bad:#FF8A80; --bad-soft:#3F1E1B;
+  --shadow:0 10px 40px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0;padding-inline:16px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stage{min-height:100%;display:flex;gap:40px;justify-content:center;align-items:center;padding-block:16px}
+.side{max-width:340px;display:none}
+.side h1{font-family:var(--display);font-size:34px;line-height:1.05;margin:0 0 8px;color:var(--brand);text-wrap:balance}
+.side p{color:var(--ink2);margin:0 0 20px}
+.side ul{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.side li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start}
+.side li b{display:block;font-family:var(--display);font-size:15px}
+.side li span{color:var(--ink2);font-size:13.5px}
+.side .credit{margin:22px 0 0;font-size:13px;color:var(--ink2);border-top:1px solid var(--line);padding-top:12px}
+.side .ic{width:34px;height:34px;border-radius:10px;background:var(--surface);display:grid;place-items:center;color:var(--brand);border:1px solid var(--line)}
+@media (min-width:900px){ .side{display:block} }
+
+.app{width:100%;max-width:390px;height:min(820px,calc(100vh - 32px));min-height:560px;background:var(--surface2);border-radius:28px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative}
+@media (max-width:520px){ body{padding-inline:0} .stage{padding-block:0;align-items:stretch} .app{max-width:none;height:100vh;height:100dvh;border-radius:0;border:0;box-shadow:none} }
+
+.top{display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--brand);color:var(--brand-ink)}
+.top h2{font-family:var(--display);font-size:18px;margin:0;flex:1;min-width:0;line-height:1.1;overflow-wrap:anywhere}
+.top .chip{flex:none;padding:6px 9px}
+.top .back{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.16);color:inherit}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;font-weight:700;font-size:12px;background:rgba(255,255,255,.18);color:inherit;min-height:32px}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff}
+.banner{padding:8px 14px;font-size:12.5px;font-weight:700;display:flex;gap:8px;align-items:center}
+.banner.off{background:var(--warn-soft);color:var(--warn)}
+.banner.on{background:var(--ok-soft);color:var(--ok)}
+main{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+main>*{flex-shrink:0}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px 8px;font-size:11px;font-weight:700;color:var(--ink2);min-height:56px}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--brand)}
+.tab[aria-current="page"] svg{stroke-width:2.6}
+.tab .dot{width:18px;height:3px;border-radius:2px;background:transparent}
+.tab[aria-current="page"] .dot{background:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.h{font-family:var(--display);font-size:17px;margin:0 0 4px}
+.muted{color:var(--ink2);font-size:13px}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;font-weight:700;background:var(--brand);color:var(--brand-ink);min-height:46px}
+.btn.alt{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.btn.acc{background:var(--accent);color:#fff}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn svg{width:20px;height:20px}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11.5px;font-weight:700;background:var(--surface2);color:var(--ink2);border:1px solid var(--line)}
+.pill.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.acc{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+
+.hello{background:var(--brand);color:var(--brand-ink);border-radius:18px;padding:16px;border:0}
+.hello .h{font-size:22px;line-height:1.1}
+.hello .muted{color:inherit;opacity:.85}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.lv{padding:9px 4px;border-radius:10px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.14);color:inherit;text-align:center;min-height:44px}
+.lv[aria-pressed="true"]{background:#fff;color:#0F4C6B}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:104px}
+.q svg{width:26px;height:26px;color:var(--accent)}
+.q b{font-family:var(--display);font-size:15px}
+.q span{font-size:12.5px;color:var(--ink2)}
+.bar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+
+.list{display:grid;gap:10px}
+.li{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:left;width:100%}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;color:#fff;flex:none}
+.thread{display:flex;flex-direction:column;gap:10px}
+.msg{max-width:88%;background:var(--surface);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:9px 12px}
+.msg.me{align-self:flex-end;background:var(--brand);color:var(--brand-ink);border-color:transparent;border-radius:16px 16px 4px 16px}
+.msg small{display:block;font-weight:700;font-size:11.5px;opacity:.75;margin-bottom:2px}
+.audio{display:flex;align-items:center;gap:10px}
+.audio .play{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;flex:none}
+.audio .play svg{width:16px;height:16px}
+.wave{display:flex;align-items:center;gap:2px;height:24px;flex:1}
+.wave i{width:3px;border-radius:2px;background:currentColor;opacity:.5}
+.composer{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--line)}
+.composer input,textarea{flex:1;font:inherit;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;min-height:46px;min-width:0}
+textarea{width:100%;resize:vertical;min-height:96px}
+.ib{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--brand);color:var(--brand-ink);flex:none}
+.ib.acc{background:var(--accent);color:#fff}
+.ib svg{width:22px;height:22px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{padding:10px;border-radius:9px;font-weight:700;color:var(--ink2);min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.rec{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 14px}
+.recbtn{width:92px;height:92px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 8px var(--accent-soft)}
+.recbtn svg{width:40px;height:40px}
+.recbtn.on{background:var(--bad);box-shadow:0 0 0 8px var(--bad-soft);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 14px var(--bad-soft)}}
+@media (prefers-reduced-motion:reduce){.recbtn.on{animation:none}.bar i{transition:none}}
+.timer{font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums}
+del{background:var(--bad-soft);color:var(--bad);text-decoration:line-through;padding:0 3px;border-radius:4px}
+ins{background:var(--ok-soft);color:var(--ok);text-decoration:none;padding:0 3px;border-radius:4px;font-weight:700}
+.tip{background:var(--accent-soft);border-radius:12px;padding:10px 12px;font-size:13px}
+.ch{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.check{width:32px;height:32px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:transparent;background:var(--surface)}
+.check[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.check svg{width:18px;height:18px}
+.phr{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line)}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.rule button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;padding:14px;font-weight:700;min-height:50px}
+.rule .n{width:26px;height:26px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-size:13px;flex:none}
+.rule p{margin:0;padding:0 14px 14px 50px;color:var(--ink2);font-size:14px}
+.incall{background:var(--brand);color:var(--brand-ink);border-radius:18px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.incall .timer{color:inherit}
+.toast{position:absolute;left:14px;right:14px;bottom:72px;background:var(--ink);color:var(--bg);padding:11px 14px;border-radius:12px;font-weight:700;font-size:13.5px;text-align:center;z-index:5}
+.w{display:inline;padding:0 1px;border-bottom:2px dotted var(--accent);font:inherit;color:inherit;cursor:pointer;background:none}
+.msg.ai{background:var(--surface);max-width:92%}
+.msg .tools{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.mini{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--surface2);color:var(--ink);border:1px solid var(--line);min-height:34px}
+.msg.me .mini{background:rgba(255,255,255,.16);color:inherit;border-color:transparent}
+.mini svg{width:14px;height:14px}
+.chips{display:flex;flex-direction:column;gap:6px;padding:0 0 4px}
+.sug{text-align:left;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px dashed var(--brand);font-weight:600;font-size:13.5px;min-height:44px}
+.fix{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:8px;font-size:13px;color:var(--ink)}
+.fix.good{background:var(--ok-soft);border-color:transparent;color:var(--ok);font-weight:700}
+.score{display:inline}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:11.5px;color:var(--ink2)}
+.scn{display:flex;gap:12px;align-items:center;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.scn .ib{color:#fff}
+.flash{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;background:var(--brand);color:var(--brand-ink);border-radius:18px;padding:20px;width:100%}
+.flash b{font-family:var(--display);font-size:28px}
+.app{font-family:var(--body)}
+.app.dys{--body:'Lexend','Verdana',system-ui,sans-serif;--display:'Lexend','Verdana',system-ui,sans-serif;letter-spacing:.03em;word-spacing:.12em;line-height:1.75}
+.app.calm *{animation:none!important;transition:none!important}
+.app.calm{filter:saturate(.7)}
+.app.big{font-size:17px}
+.app.big .btn,.app.big .tab,.app.big .ib,.app.big .lv,.app.big .opt{min-height:58px}
+.app.hc .card,.app.hc .li,.app.hc .q,.app.hc .scn,.app.hc .opt,.app.hc .msg{border-width:2px;border-color:var(--ink)}
+.app.hc .muted{color:var(--ink)}
+.levels{grid-template-columns:repeat(4,1fr)}
+.seg.s3{grid-template-columns:repeat(3,1fr)}
+.dots{display:flex;align-items:center;gap:6px}
+.dots i{width:28px;height:6px;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--accent)}
+.dots span{margin-left:auto}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700}
+.field input{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:12px;min-height:50px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px;min-height:56px}
+.opt[aria-pressed="true"]{border-color:var(--brand);background:var(--accent-soft)}
+.opt .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--ink2);display:grid;place-items:center;flex:none;background:var(--surface);color:var(--brand)}
+.opt[aria-pressed="true"] .box{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.opt .box svg{width:16px;height:16px;stroke-width:3.2}
+.pic{background:#F4F8FA;border-radius:22px;display:grid;place-items:center;padding:14px;border:1px solid var(--line)}
+.pic svg{width:min(62%,180px);height:auto}
+.bigword{font-family:var(--display);font-size:34px;font-weight:800;color:var(--brand)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+
+<div class="stage">
+  <aside class="side">
+    <h1>Rolê da Fala</h1>
+    <p data-side="lead"></p>
+    <ul data-side="list"></ul>
+    <p class="credit" data-side="credit"></p>
+  </aside>
+  <div class="app" id="app" role="application" aria-label="Rolê da Fala"></div>
+</div>
+
+<script>
+(function(){
+  var S = {
+    lang:'pt', screen:'onb', room:null, offline:false, level:'zero', saver:true,
+    pack:0, packPct:0, rules:0, toast:'', tab:'speak',
+    draft:'', wdraft:'', writeTxt:'',
+    rec:false, sec:0, call:{partner:0, video:false, active:false, sec:0},
+    msgs:{
+      conv:[
+        {w:'Marina',t:'Hi everyone! What did you do this weekend?'},
+        {w:'Davi',t:'I went to the football with my family. It was fun!'},
+        {w:'Bia',a:'0:12'},
+        {w:'Marina',t:'Nice, Davi! Bia, your audio was great. Keep going!'}
+      ],
+      dicas:[
+        {w:'Marina',t:'Dica: em inglês dizemos "I am 20 years old", e não "I have 20 years".'},
+        {w:'Rafa',t:'Para treinar: escute uma música curta e escreva 3 palavras novas por dia.'}
+      ]
+    },
+    spk:[{title:'"My name is Bia and I live in..."',from:'Marina',st:'done',
+      note:{pt:'Ótima apresentação, Bia! Para o "th" de "think", coloque a língua entre os dentes. Você já está bem clara.',en:'Great introduction, Bia! For the "th" in "think", place your tongue between your teeth. You are already very clear.'}}],
+    wri:[{orig:'Yesterday I go to the market and buy bananas.',fix:'Yesterday I <ins>went</ins> to the market and <ins>bought</ins> bananas.',
+      del:'Yesterday I <del>go</del> to the market and <del>buy</del> bananas.',from:'Rafa',st:'done',
+      note:{pt:'Ontem = passado. go → went, buy → bought. Muito bom o vocabulário!',en:'Yesterday = past. go → went, buy → bought. Your vocabulary is very good!'}}],
+    ch:[{id:1,k:'speak',done:true,pt:'Diga 3 frases sobre a sua rua',en:'Say 3 sentences about your street',mp:'Falar · 5 min',me:'Speaking · 5 min'},
+        {id:2,k:'write',done:false,pt:'Escreva sobre a sua comida favorita',en:'Write about your favorite food',mp:'Escrever · 10 min',me:'Writing · 10 min'},
+        {id:3,k:'listen',done:false,pt:'Ouça e repita 4 frases do dia a dia',en:'Listen and repeat 4 daily phrases',mp:'Ouvir · 5 min',me:'Listening · 5 min'}],
+    phrases:['Good morning! How are you?','Where is the bus stop?','Can you help me, please?','I would like some water.'],
+    calls:[
+      {pt:'Roda de conversa · Iniciantes',en:'Conversation circle · Beginners',when:{pt:'Quarta, 19h30',en:'Wednesday, 7:30 pm'},n:4},
+      {pt:'Dupla rápida de speaking',en:'Quick speaking pair',when:{pt:'Hoje, 21h',en:'Today, 9 pm'},n:2}
+    ],
+    tut:{view:'pics',scn:null,chat:[],step:0,fc:0,flip:false,draft:'',done:false,fixes:0,tips:{}},
+    xp:120, streak:3, mins:42,
+    pics:{i:0,rev:false,res:null,busy:false,best:{}}, focus:{run:false,left:300}, rout:[false,false,false], showAll:false,
+    vocab:[{w:'please',pt:'por favor',k:false},{w:'water',pt:'água',k:true},{w:'bus stop',pt:'ponto de ônibus',k:false}],
+    partners:['Marina','Davi','Bia','Rafa'],
+    topics:{pt:['Fale sobre o seu dia.','Qual comida você gosta mais?','Descreva o seu bairro.'],en:['Talk about your day.','What food do you like most?','Describe your neighborhood.']}
+  };
+  var colors=['#0F4C6B','#E8702A','#1E8A5A','#7A4EB0','#B4372F'];
+  var DICT={nice:'legal',meet:'conhecer',great:'ótimo',hello:'olá',welcome:'bem-vindo',market:'mercado',today:'hoje',sure:'claro',tomatoes:'tomates',anything:'qualquer coisa',else:'mais',bag:'sacola',name:'nome',birth:'nascimento',help:'ajudar',doctor:'médico',wait:'esperar',yourself:'você mesmo',job:'emprego',strength:'ponto forte',students:'alunos',phones:'celulares',class:'aula',example:'exemplo',opinion:'opinião',point:'ponto',morning:'manhã',interesting:'interessante'};
+  var PR={done:false,step:0,name:'',needs:{}};
+  var NEEDS=[
+    ['blind','Cegueira (uso por voz)','Blindness (voice use)','O app fala cada tela, descreve as figuras e usa botões grandes.','The app reads each screen aloud, describes pictures and uses large buttons.'],
+    ['lowvis','Baixa visão','Low vision','Letras maiores, alto contraste e botões grandes.','Larger text, high contrast and large buttons.'],
+    ['dys','Dislexia','Dyslexia','Fonte Lexend, mais espaço entre letras e palavras e botão para ouvir os textos.','Lexend font, more space between letters and words, and a button to hear texts.'],
+    ['adhd','TDAH','ADHD','Uma tarefa por vez, sessões de 5 minutos, pausas e menos itens na tela.','One task at a time, 5-minute sessions, breaks and fewer items on screen.'],
+    ['autism','Autismo (TEA)','Autism (ASD)','Rotina previsível, sem animações, linguagem direta e aviso antes de mudar de atividade.','Predictable routine, no animations, direct language and a heads-up before activity changes.'],
+    ['deaf','Surdez ou dificuldade de ouvir','Deaf or hard of hearing','Tudo com texto e dicas visuais de pronúncia, sem depender de áudio.','Everything in text with visual pronunciation tips, without relying on audio.'],
+    ['none','Prefiro não informar','Prefer not to say','Você pode mudar isso depois em Meu perfil.','You can change this later in My profile.']
+  ];
+  function pic(w,ph,pt,d,de,tp,te,mis,svg){return {w:w,ph:ph,pt:pt,d:d,de:de,tip:[tp,te],mis:mis,svg:'<svg viewBox="0 0 100 100" aria-hidden="true">'+svg+'</svg>'}}
+  function pentPts(cx,cy,r,rot){var p=[];for(var i=0;i<5;i++){var a=(rot+i*72)*Math.PI/180;p.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1))}return p.join(' ')}
+  var BALL=(function(){
+    var s='<defs><radialGradient id="bg1" cx="36%" cy="30%" r="85%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#E6E6E6"/><stop offset="1" stop-color="#8E8E8E"/></radialGradient>'+
+    '<radialGradient id="bg2" cx="35%" cy="28%" r="80%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>'+
+    '<clipPath id="bc"><circle cx="50" cy="50" r="34"/></clipPath><filter id="bb" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>'+
+    '<ellipse cx="50" cy="88" rx="26" ry="4.5" fill="#000" opacity=".25" filter="url(#bb)"/>'+
+    '<circle cx="50" cy="50" r="34" fill="url(#bg1)"/><g clip-path="url(#bc)">';
+    var i,ring=[];
+    s+='<polygon points="'+pentPts(50,50,15,-90)+'" fill="#161616"/>';
+    for(i=0;i<10;i++){var a=(-90+i*36)*Math.PI/180;ring.push((50+27*Math.cos(a)).toFixed(1)+','+(50+27*Math.sin(a)).toFixed(1))}
+    for(i=0;i<5;i++){var a2=(-90+i*72)*Math.PI/180;s+='<line x1="'+(50+15*Math.cos(a2)).toFixed(1)+'" y1="'+(50+15*Math.sin(a2)).toFixed(1)+'" x2="'+(50+27*Math.cos(a2)).toFixed(1)+'" y2="'+(50+27*Math.sin(a2)).toFixed(1)+'" stroke="#7d7d7d" stroke-width="1.1"/>'}
+    s+='<polygon points="'+ring.join(' ')+'" fill="none" stroke="#7d7d7d" stroke-width="1.1"/>';
+    for(i=0;i<5;i++){var b=-54+i*72,ra=b*Math.PI/180;s+='<polygon points="'+pentPts(50+40*Math.cos(ra),50+40*Math.sin(ra),13.5,b+180)+'" fill="#161616"/>'}
+    s+='</g><circle cx="50" cy="50" r="34" fill="url(#bg2)"/><ellipse cx="38" cy="33" rx="9" ry="5.5" fill="#fff" opacity=".55" filter="url(#bb)" transform="rotate(-30 38 33)"/>';
+    return s})();
+  var APPLE='<defs><radialGradient id="ag" cx="34%" cy="30%" r="82%"><stop offset="0" stop-color="#FF9F90"/><stop offset=".3" stop-color="#E5342A"/><stop offset=".75" stop-color="#A51313"/><stop offset="1" stop-color="#5E0808"/></radialGradient><linearGradient id="al" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7CD452"/><stop offset="1" stop-color="#2A7B25"/></linearGradient><linearGradient id="as" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8A5B32"/><stop offset="1" stop-color="#3A2510"/></linearGradient><filter id="ab" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2"/></filter></defs>'+
+    '<ellipse cx="50" cy="91" rx="30" ry="4.5" fill="#000" opacity=".25" filter="url(#ab)"/>'+
+    '<path d="M50 30C41 23 22 29 20 52C18 74 33 93 46 90C49 89 51 89 54 90C67 93 82 74 80 52C78 29 59 23 50 30Z" fill="url(#ag)"/>'+
+    '<path d="M76 56C76 74 67 87 55 89" stroke="#3A0505" stroke-width="6" opacity=".3" fill="none" filter="url(#ab)"/>'+
+    '<path d="M30 44C40 36 44 60 36 82" stroke="#FFB347" stroke-width="2" opacity=".18" fill="none"/><path d="M62 40C70 50 68 70 60 84" stroke="#FFB347" stroke-width="2" opacity=".14" fill="none"/>'+
+    '<ellipse cx="33" cy="47" rx="5" ry="10" fill="#fff" opacity=".4" filter="url(#ab)" transform="rotate(14 33 47)"/>'+
+    '<ellipse cx="50" cy="32" rx="9" ry="3.5" fill="#4A0808" opacity=".6" filter="url(#ab)"/>'+
+    '<path d="M50 33C50 25 52 18 57 12" stroke="url(#as)" stroke-width="3.2" stroke-linecap="round" fill="none"/>'+
+    '<path d="M55 22C61 12 75 12 81 18C75 29 63 31 55 22Z" fill="url(#al)"/><path d="M57 22C64 18 71 17 79 18" stroke="#1F5E1C" stroke-width=".8" fill="none" opacity=".7"/>';
+  var SUN='<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A86DC"/><stop offset="1" stop-color="#B4DEFF"/></linearGradient><radialGradient id="sg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".22" stop-color="#FFF4B8"/><stop offset=".5" stop-color="#FFC93C" stop-opacity=".85"/><stop offset="1" stop-color="#FFB000" stop-opacity="0"/></radialGradient><clipPath id="sc"><rect x="2" y="2" width="96" height="96" rx="10"/></clipPath><filter id="sb" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>'+
+    '<g clip-path="url(#sc)"><rect x="2" y="2" width="96" height="96" fill="url(#sk)"/><circle cx="50" cy="44" r="52" fill="url(#sg)"/><circle cx="50" cy="44" r="12.5" fill="#FFFEF2"/>'+
+    '<g fill="#fff" opacity=".92" filter="url(#sb)"><ellipse cx="22" cy="78" rx="22" ry="7"/><ellipse cx="38" cy="73" rx="14" ry="8.5"/><ellipse cx="80" cy="86" rx="20" ry="6"/><ellipse cx="70" cy="80" rx="11" ry="7"/></g></g>';
+  var HOUSE='<defs><linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ED36B"/><stop offset="1" stop-color="#3E8B32"/></linearGradient><linearGradient id="hw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3D9B1"/><stop offset="1" stop-color="#CFA36F"/></linearGradient><linearGradient id="hr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8543A"/><stop offset="1" stop-color="#8E3320"/></linearGradient><linearGradient id="hd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8A5A34"/><stop offset="1" stop-color="#5A3520"/></linearGradient><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#CBEBFF"/><stop offset="1" stop-color="#4F8FBF"/></linearGradient><linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCEFFC"/><stop offset="1" stop-color="#F6FBFF"/></linearGradient>'+
+    '<pattern id="hb" width="8" height="4" patternUnits="userSpaceOnUse"><path d="M0 .4H8M4 .4V4" stroke="#9C5F38" stroke-width=".5" opacity=".45" fill="none"/></pattern><pattern id="ht" width="6" height="4" patternUnits="userSpaceOnUse"><path d="M0 4A3 3 0 0 1 6 4" stroke="#5B1F12" stroke-width=".6" opacity=".5" fill="none"/></pattern><filter id="hb2" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>'+
+    '<rect x="2" y="2" width="96" height="96" rx="10" fill="url(#hs)"/><ellipse cx="50" cy="90" rx="46" ry="10" fill="url(#hl)"/>'+
+    '<rect x="20" y="46" width="60" height="42" fill="url(#hw)"/><rect x="20" y="46" width="60" height="42" fill="url(#hb)"/>'+
+    '<rect x="66" y="20" width="9" height="20" fill="#A85B3B"/><rect x="65" y="18" width="11" height="3.5" fill="#7E3F27"/>'+
+    '<polygon points="11,49 50,15 89,49" fill="url(#hr)"/><polygon points="11,49 50,15 89,49" fill="url(#ht)"/><rect x="20" y="49" width="60" height="4" fill="#000" opacity=".2" filter="url(#hb2)"/>'+
+    '<rect x="43" y="60" width="14" height="28" rx="1" fill="url(#hd)" stroke="#F4F4F4" stroke-width="1.4"/><path d="M50 60V88M46 66h8M46 76h8" stroke="#3E2413" stroke-width=".6" opacity=".6"/><circle cx="54.5" cy="75" r="1" fill="#F0C75E"/>'+
+    '<g><rect x="25" y="55" width="12" height="12" fill="url(#hg)" stroke="#F4F4F4" stroke-width="1.4"/><path d="M31 55V67M25 61H37" stroke="#F4F4F4" stroke-width=".9"/><rect x="24" y="67" width="14" height="2" fill="#E4E4E4"/><rect x="63" y="55" width="12" height="12" fill="url(#hg)" stroke="#F4F4F4" stroke-width="1.4"/><path d="M69 55V67M63 61H75" stroke="#F4F4F4" stroke-width=".9"/><rect x="62" y="67" width="14" height="2" fill="#E4E4E4"/></g>'+
+    '<rect x="40" y="88" width="20" height="2.5" fill="#B9B4AA"/>';
+  var BOOK='<defs><linearGradient id="bk1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A8AF2"/><stop offset="1" stop-color="#1B47A6"/></linearGradient><linearGradient id="bk2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1B3E8F"/><stop offset="1" stop-color="#2D5BC4"/></linearGradient><linearGradient id="bk3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EDE3CB"/><stop offset="1" stop-color="#FFFDF6"/></linearGradient><filter id="bkb" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter></defs>'+
+    '<ellipse cx="52" cy="92" rx="32" ry="4.5" fill="#000" opacity=".26" filter="url(#bkb)"/>'+
+    '<polygon points="78,22 84,25 84,92 78,89" fill="url(#bk3)"/><path d="M79.5 27V89M81 28V90M82.5 29V91" stroke="#CFC4A6" stroke-width=".5"/>'+
+    '<polygon points="26,89 78,89 84,92 32,92" fill="#D9CFB4"/>'+
+    '<rect x="19" y="20" width="9" height="69" rx="1.5" fill="url(#bk2)"/><rect x="26" y="20" width="52" height="69" rx="1.5" fill="url(#bk1)"/>'+
+    '<rect x="26" y="20" width="4" height="69" fill="#fff" opacity=".16"/><rect x="26" y="20" width="52" height="69" rx="1.5" fill="none" stroke="#0E2A70" stroke-width=".6" opacity=".6"/>'+
+    '<rect x="34" y="31" width="36" height="7" rx="2" fill="#F5E4A8"/><rect x="38" y="43" width="28" height="3" rx="1.5" fill="#F5E4A8" opacity=".85"/><circle cx="52" cy="66" r="9" fill="none" stroke="#F0CD6E" stroke-width="1.6"/><path d="M47 66h10M52 61v10" stroke="#F0CD6E" stroke-width="1.2"/>'+
+    '<path d="M66 89V98l3-2.5 3 2.5V89Z" fill="#C42B2B"/>';
+  var CUP='<defs><radialGradient id="cg1" cx="30%" cy="25%" r="95%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#EDEFF2"/><stop offset="1" stop-color="#B7BDC6"/></radialGradient><linearGradient id="cg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F0F1F4"/><stop offset="1" stop-color="#B9C0CA"/></linearGradient><radialGradient id="cg3" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#9A6238"/><stop offset=".6" stop-color="#5E3519"/><stop offset="1" stop-color="#341B0B"/></radialGradient><filter id="cb" x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="2"/></filter><filter id="cs" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4"/></filter></defs>'+
+    '<ellipse cx="50" cy="86" rx="40" ry="6" fill="#000" opacity=".22" filter="url(#cb)"/>'+
+    '<ellipse cx="50" cy="78" rx="38" ry="10" fill="url(#cg1)" stroke="#C6CCD4" stroke-width=".8"/><ellipse cx="50" cy="77" rx="26" ry="6.5" fill="#E5E8EC"/>'+
+    '<path d="M74 44C93 42 93 66 71 67" stroke="#B9C0CA" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M74 44C93 42 93 66 71 67" stroke="url(#cg2)" stroke-width="4.6" fill="none" stroke-linecap="round"/>'+
+    '<path d="M23 40C23 64 33 78 50 78C67 78 77 64 77 40Z" fill="url(#cg2)"/><path d="M69 46C68 62 62 72 54 76" stroke="#8B93A0" stroke-width="5" opacity=".25" fill="none" filter="url(#cs)"/>'+
+    '<ellipse cx="50" cy="40" rx="27" ry="7.5" fill="#F7F8FA" stroke="#C4CAD2" stroke-width=".8"/><ellipse cx="50" cy="41" rx="23" ry="5.8" fill="url(#cg3)"/><ellipse cx="50" cy="41.5" rx="19" ry="4" fill="none" stroke="#B98957" stroke-width=".8" opacity=".55"/><ellipse cx="42" cy="40" rx="6" ry="1.4" fill="#fff" opacity=".35" filter="url(#cs)"/>'+
+    '<path d="M32 56C33 64 36 70 40 73" stroke="#fff" stroke-width="3" opacity=".7" fill="none" stroke-linecap="round" filter="url(#cs)"/>'+
+    '<g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".55" filter="url(#cs)"><path d="M42 32C38 26 46 22 42 15"/><path d="M52 33C48 26 56 22 52 13"/><path d="M62 32C58 27 65 24 62 17"/></g>';
+  var BANANA='<defs><linearGradient id="nb1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFEE7A"/><stop offset=".55" stop-color="#F7C81C"/><stop offset="1" stop-color="#C98F00"/></linearGradient><linearGradient id="nb2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9DB04A"/><stop offset="1" stop-color="#5A5222"/></linearGradient><filter id="nbb" x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>'+
+    '<ellipse cx="54" cy="90" rx="34" ry="4.5" fill="#000" opacity=".24" filter="url(#nbb)"/>'+
+    '<path d="M25 22C19 58 46 90 88 69L86 62C57 75 35 54 36 22Z" fill="url(#nb1)"/>'+
+    '<path d="M28 26C25 52 46 78 84 65" stroke="#B98300" stroke-width=".9" fill="none" opacity=".5"/><path d="M31 26C30 48 48 70 83 64" stroke="#B98300" stroke-width=".7" fill="none" opacity=".35"/>'+
+    '<path d="M26 26C24 52 42 76 66 78" stroke="#8A5A00" stroke-width="5" opacity=".2" fill="none" filter="url(#nbb)"/>'+
+    '<path d="M34 24C36 46 52 62 76 64" stroke="#FFFBD0" stroke-width="2.6" opacity=".6" fill="none" stroke-linecap="round" filter="url(#nbb)"/>'+
+    '<polygon points="25,22 36,22 35,11 27,11" fill="url(#nb2)"/><rect x="26" y="9" width="10" height="3" rx="1" fill="#4A4118"/>'+
+    '<path d="M84 63L89 68L87 72L84 71Z" fill="#3E2C12"/><circle cx="43" cy="42" r=".8" fill="#7A5A08" opacity=".7"/><circle cx="55" cy="60" r=".7" fill="#7A5A08" opacity=".7"/><circle cx="48" cy="52" r=".6" fill="#7A5A08" opacity=".6"/>';
+  var TREE='<defs><radialGradient id="tf" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#8ADB5E"/><stop offset=".5" stop-color="#3F9C36"/><stop offset="1" stop-color="#1C5F20"/></radialGradient><linearGradient id="tt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8A5C36"/><stop offset=".5" stop-color="#6A4326"/><stop offset="1" stop-color="#3C2412"/></linearGradient><filter id="tb" x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter></defs>'+
+    '<ellipse cx="50" cy="91" rx="34" ry="5" fill="#000" opacity=".25" filter="url(#tb)"/>'+
+    '<path d="M42 92C46 76 45 62 42 50L58 50C55 62 54 76 58 92Z" fill="url(#tt)"/><path d="M47 88C48 74 47 64 46 54M53 86C52 74 53 64 54 54" stroke="#2E1B0D" stroke-width=".8" opacity=".55" fill="none"/><path d="M42 92C38 92 36 94 33 93M58 92C62 92 64 94 67 93" stroke="#3C2412" stroke-width="2" fill="none" stroke-linecap="round"/>'+
+    '<g fill="#22682A"><circle cx="30" cy="46" r="17"/><circle cx="70" cy="46" r="17"/><circle cx="50" cy="52" r="18"/></g>'+
+    '<g fill="url(#tf)"><circle cx="33" cy="40" r="16"/><circle cx="67" cy="40" r="16"/><circle cx="50" cy="45" r="17"/><circle cx="40" cy="26" r="15"/><circle cx="60" cy="26" r="15"/><circle cx="50" cy="18" r="13"/></g>'+
+    '<g fill="#B7F08A" opacity=".35"><circle cx="38" cy="22" r="4"/><circle cx="28" cy="36" r="3.5"/><circle cx="48" cy="38" r="3"/><circle cx="58" cy="17" r="3"/></g>'+
+    '<g fill="#12471A" opacity=".3"><circle cx="66" cy="52" r="6"/><circle cx="46" cy="58" r="6"/><circle cx="76" cy="40" r="4"/></g>';
+  var BUS='<defs><linearGradient id="bu1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D3DEE8"/></linearGradient><linearGradient id="bu2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9BD0F5"/><stop offset="1" stop-color="#1F4A78"/></linearGradient><radialGradient id="bu3" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#F3F5F7"/><stop offset="1" stop-color="#7E8791"/></radialGradient><filter id="bub" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="2"/></filter></defs>'+
+    '<ellipse cx="50" cy="86" rx="46" ry="4.5" fill="#000" opacity=".28" filter="url(#bub)"/>'+
+    '<rect x="6" y="26" width="88" height="52" rx="7" fill="url(#bu1)" stroke="#AEBBC7" stroke-width=".8"/>'+
+    '<rect x="6" y="56" width="88" height="10" fill="#1F5FBF"/><rect x="6" y="66" width="88" height="12" fill="#12386F"/><rect x="6" y="56" width="88" height="1.6" fill="#fff" opacity=".35"/>'+
+    '<rect x="12" y="29" width="34" height="4.5" rx="1" fill="#141414"/><rect x="14" y="30.4" width="18" height="1.6" fill="#FFB020"/>'+
+    '<g stroke="#8FA0B0" stroke-width=".8"><rect x="12" y="36" width="15" height="16" rx="1.5" fill="url(#bu2)"/><rect x="30" y="36" width="15" height="16" rx="1.5" fill="url(#bu2)"/><rect x="48" y="36" width="15" height="16" rx="1.5" fill="url(#bu2)"/><rect x="66" y="36" width="9" height="24" rx="1.5" fill="url(#bu2)"/><rect x="78" y="34" width="13" height="18" rx="2" fill="url(#bu2)"/></g><path d="M70.5 36V60" stroke="#8FA0B0" stroke-width=".8"/>'+
+    '<path d="M14 38L22 38L16 50L14 50Z" fill="#fff" opacity=".28"/><path d="M50 38L58 38L52 50L50 50Z" fill="#fff" opacity=".28"/>'+
+    '<rect x="91" y="58" width="4" height="4" rx="1" fill="#FFF3B8"/><rect x="5" y="58" width="2.5" height="4" fill="#D93030"/>'+
+    '<path d="M14 78A11 11 0 0 1 36 78Z" fill="#0A0A0A"/><path d="M62 78A11 11 0 0 1 84 78Z" fill="#0A0A0A"/>'+
+    '<circle cx="25" cy="77" r="9" fill="#1A1A1A"/><circle cx="25" cy="77" r="5" fill="url(#bu3)"/><circle cx="25" cy="77" r="1.6" fill="#555"/>'+
+    '<circle cx="73" cy="77" r="9" fill="#1A1A1A"/><circle cx="73" cy="77" r="5" fill="url(#bu3)"/><circle cx="73" cy="77" r="1.6" fill="#555"/>'+
+    '<rect x="8" y="27" width="84" height="3" rx="1.5" fill="#fff" opacity=".7"/>';
+  var DOG='<defs><filter id="df" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/></filter><filter id="db" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter>'+
+    '<radialGradient id="dh" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#F6CD85"/><stop offset=".6" stop-color="#D49A4B"/><stop offset="1" stop-color="#A76B2A"/></radialGradient><linearGradient id="de" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B27636"/><stop offset="1" stop-color="#6A3F17"/></linearGradient><radialGradient id="dm" cx="45%" cy="35%" r="75%"><stop offset="0" stop-color="#FCE8C8"/><stop offset="1" stop-color="#E2B879"/></radialGradient><radialGradient id="dn" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#5A5A5A"/><stop offset="1" stop-color="#050505"/></radialGradient><linearGradient id="dt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F58FA0"/><stop offset="1" stop-color="#D2566E"/></linearGradient></defs>'+
+    '<ellipse cx="50" cy="94" rx="30" ry="4" fill="#000" opacity=".22" filter="url(#db)"/>'+
+    '<g filter="url(#df)"><ellipse cx="50" cy="85" rx="24" ry="11" fill="#C98F44"/>'+
+    '<path d="M30 30C14 32 8 56 15 72C24 78 33 64 35 46Z" fill="url(#de)"/><path d="M70 30C86 32 92 56 85 72C76 78 67 64 65 46Z" fill="url(#de)"/>'+
+    '<ellipse cx="50" cy="50" rx="27" ry="28" fill="url(#dh)"/><ellipse cx="50" cy="66" rx="16" ry="13" fill="url(#dm)"/></g>'+
+    '<path d="M46 33C48 40 52 40 54 33" stroke="#B7793A" stroke-width="2" opacity=".5" fill="none"/>'+
+    '<path d="M34 41C37 38 41 38 44 40M56 40C59 38 63 38 66 41" stroke="#8A5624" stroke-width="1.6" fill="none" stroke-linecap="round"/>'+
+    '<circle cx="40" cy="47" r="4.6" fill="#2A170A"/><circle cx="60" cy="47" r="4.6" fill="#2A170A"/><circle cx="41.5" cy="45.5" r="1.4" fill="#fff"/><circle cx="61.5" cy="45.5" r="1.4" fill="#fff"/><circle cx="38.8" cy="48.6" r=".8" fill="#fff" opacity=".6"/><circle cx="58.8" cy="48.6" r=".8" fill="#fff" opacity=".6"/>'+
+    '<path d="M43 59C43 55 57 55 57 59C57 63 52 66 50 66C48 66 43 63 43 59Z" fill="url(#dn)"/><ellipse cx="47.5" cy="57.5" rx="2.4" ry="1.2" fill="#fff" opacity=".55"/>'+
+    '<path d="M50 66V70M50 70C47 75 41 74 40 70M50 70C53 75 59 74 60 70" stroke="#5A3418" stroke-width="1.4" fill="none" stroke-linecap="round"/>'+
+    '<path d="M46 73C46 82 54 82 54 73C52 75 48 75 46 73Z" fill="url(#dt)"/><path d="M50 74V79" stroke="#B8425A" stroke-width=".7"/>';
+  var CAT='<defs><filter id="kf" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter><filter id="kb" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4"/></filter>'+
+    '<radialGradient id="kh" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#C9CFD6"/><stop offset=".6" stop-color="#95A0AB"/><stop offset="1" stop-color="#66707B"/></radialGradient><radialGradient id="ke" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#D5F07A"/><stop offset=".6" stop-color="#7FB43A"/><stop offset="1" stop-color="#3F7A1B"/></radialGradient><radialGradient id="km" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D6DBE0"/></radialGradient></defs>'+
+    '<ellipse cx="50" cy="94" rx="28" ry="4" fill="#000" opacity=".22" filter="url(#kb)"/>'+
+    '<g filter="url(#kf)"><ellipse cx="50" cy="85" rx="22" ry="11" fill="#8A94A0"/><polygon points="20,50 22,14 46,32" fill="#7E8994"/><polygon points="80,50 78,14 54,32" fill="#7E8994"/><ellipse cx="50" cy="56" rx="29" ry="25" fill="url(#kh)"/></g>'+
+    '<polygon points="26,42 27,22 40,32" fill="#F3B6C0"/><polygon points="74,42 73,22 60,32" fill="#F3B6C0"/>'+
+    '<g stroke="#4A525B" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".7"><path d="M50 34V44"/><path d="M43 35L44 43"/><path d="M57 35L56 43"/><path d="M22 54H30M22 60H31"/><path d="M78 54H70M78 60H69"/></g>'+
+    '<ellipse cx="42" cy="68" rx="9" ry="7" fill="url(#km)"/><ellipse cx="58" cy="68" rx="9" ry="7" fill="url(#km)"/>'+
+    '<path d="M33 52C36 47 43 47 47 52C43 57 36 57 33 52Z" fill="url(#ke)" stroke="#2B3A12" stroke-width=".8"/><path d="M53 52C57 47 64 47 67 52C64 57 57 57 53 52Z" fill="url(#ke)" stroke="#2B3A12" stroke-width=".8"/>'+
+    '<ellipse cx="40" cy="52" rx="1.7" ry="4" fill="#050505"/><ellipse cx="60" cy="52" rx="1.7" ry="4" fill="#050505"/><circle cx="38.6" cy="50.2" r="1" fill="#fff"/><circle cx="58.6" cy="50.2" r="1" fill="#fff"/>'+
+    '<path d="M46.5 62H53.5L50 66.4Z" fill="#E8899B"/><path d="M50 66.4V70M50 70C47 73 43 72 42 70M50 70C53 73 57 72 58 70" stroke="#5B4A4A" stroke-width="1" fill="none" stroke-linecap="round"/>'+
+    '<g stroke="#F4F4F4" stroke-width=".7" opacity=".9" fill="none"><path d="M40 68L14 62M40 70L13 70M40 72L15 78"/><path d="M60 68L86 62M60 70L87 70M60 72L85 78"/></g>';
+  var FISH='<defs><linearGradient id="fw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9EEFF"/><stop offset="1" stop-color="#5DB0E6"/></linearGradient><radialGradient id="fb" cx="35%" cy="28%" r="85%"><stop offset="0" stop-color="#FFC069"/><stop offset=".45" stop-color="#F27A24"/><stop offset="1" stop-color="#B8420C"/></radialGradient><linearGradient id="ff" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F58A2E" stop-opacity=".95"/><stop offset="1" stop-color="#FFC27A" stop-opacity=".55"/></linearGradient><pattern id="fs" width="6" height="5" patternUnits="userSpaceOnUse"><path d="M0 5A3 3 0 0 1 6 5" stroke="#7A2A05" stroke-width=".55" fill="none" opacity=".5"/></pattern><clipPath id="fc"><rect x="2" y="2" width="96" height="96" rx="10"/></clipPath><clipPath id="fbc"><ellipse cx="46" cy="52" rx="30" ry="20"/></clipPath><filter id="fbl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>'+
+    '<g clip-path="url(#fc)"><rect x="2" y="2" width="96" height="96" fill="url(#fw)"/><path d="M2 2H98V22C80 14 60 24 40 16C24 10 12 18 2 14Z" fill="#fff" opacity=".22"/></g>'+
+    '<path d="M72 52C84 38 96 32 95 50C96 68 84 66 72 52Z" fill="url(#ff)"/><path d="M76 52L93 42M76 52L94 50M76 52L93 58" stroke="#B8500F" stroke-width=".6" opacity=".6"/>'+
+    '<path d="M32 34C38 16 58 16 64 38Z" fill="url(#ff)"/><path d="M40 34L44 22M48 34L51 20M56 35L58 24" stroke="#B8500F" stroke-width=".6" opacity=".6"/>'+
+    '<ellipse cx="46" cy="52" rx="30" ry="20" fill="url(#fb)"/><ellipse cx="46" cy="52" rx="30" ry="20" fill="url(#fs)" clip-path="url(#fbc)"/>'+
+    '<ellipse cx="44" cy="63" rx="20" ry="7" fill="#FFD9A0" opacity=".35" filter="url(#fbl)"/><path d="M28 42C40 34 56 36 64 44" stroke="#fff" stroke-width="3" opacity=".4" fill="none" stroke-linecap="round" filter="url(#fbl)"/>'+
+    '<path d="M35 39C40 47 40 57 35 65" stroke="#A73A0A" stroke-width="1.2" opacity=".7" fill="none"/>'+
+    '<path d="M42 62C50 66 56 72 48 76C42 72 40 66 42 62Z" fill="url(#ff)"/>'+
+    '<circle cx="26" cy="47" r="4.6" fill="#F3E2A0"/><circle cx="26" cy="47" r="3.3" fill="#111"/><circle cx="25" cy="45.8" r="1" fill="#fff"/>'+
+    '<g fill="none" stroke="#fff" stroke-width=".8" opacity=".8"><circle cx="14" cy="34" r="2.4"/><circle cx="18" cy="24" r="1.6"/><circle cx="12" cy="18" r="1.1"/></g>';
+  var PIC=[
+    pic('apple','épol','maçã','Uma maçã vermelha brilhante, com cabinho marrom e uma folha verde.','A shiny red apple with a brown stem and a green leaf.','O "a" soa como "é" aberto e o final é um "ol" curto: "épol".','The first "a" is open like "eh" and the ending is a short "ol": "épol".','a pull',APPLE),
+    pic('ball','ból','bola','Uma bola de futebol branca com gomos pretos.','A white soccer ball with black patches.','Boca aberta e "ó" longo, terminando com um "l" leve: "bóól".','Open mouth and a long "ó", ending with a light "l": "bóól".','bow',BALL),
+    pic('sun','sân','sol','O sol brilhante em um céu azul, com nuvens.','The bright sun in a blue sky, with clouds.','Diga "sân": o "u" vira um "â" curto e o "n" é suave.','Say "sân": the "u" becomes a short "â" and the "n" is soft.','son',SUN),
+    pic('house','ráus','casa','Uma casa de tijolos com telhado de telhas, porta de madeira e duas janelas.','A brick house with a tiled roof, a wooden door and two windows.','Comece com um "h" de sopro, como quem embaça um vidro: "ráus".','Start with a breathy "h", like fogging a window: "ráus".','how',HOUSE),
+    pic('book','buk','livro','Um livro azul de capa dura, com páginas creme e um marcador vermelho.','A blue hardcover book with cream pages and a red bookmark.','O "oo" é curto, com os lábios arredondados: "buk".','The "oo" is short, with rounded lips: "buk".','buck',BOOK),
+    pic('cup','câp','xícara','Uma xícara branca de café sobre um pires, com vapor saindo.','A white coffee cup on a saucer, with steam rising.','O "u" soa como um "â" curto: "câp", fechando os lábios no final.','The "u" sounds like a short "â": "câp", closing the lips at the end.','cop',CUP),
+    pic('banana','bânãnâ','banana','Uma banana amarela madura, com a ponta marrom.','A ripe yellow banana with a brown tip.','A sílaba forte é a do meio: ba-NA-na, com o "a" bem aberto.','The stressed syllable is the middle one: ba-NA-na, with a wide-open "a".','bananna',BANANA),
+    pic('tree','trí','árvore','Uma árvore grande, com tronco marrom e copa verde e cheia.','A big tree with a brown trunk and a full green crown.','O "tr" sai junto, e o "ee" é longo e sorridente: "trííí".','The "tr" comes out together, and the "ee" is long, with a smile: "trííí".','three',TREE),
+    pic('bus','bâs','ônibus','Um ônibus branco com faixa azul, janelas grandes e duas rodas visíveis.','A white bus with a blue stripe, large windows and two visible wheels.','Como em "sân": o "u" vira "â" e termina com um "s" longo: "bâs".','As in "sân": the "u" becomes "â" and ends with a long "s": "bâs".','boss',BUS),
+    pic('dog','dóg','cachorro','Um cachorro dourado com orelhas caídas, olhos escuros e a língua para fora.','A golden dog with floppy ears, dark eyes and its tongue out.','"o" aberto e o "g" bem curto, quase sem soltar o ar: "dóg".','An open "o" and a very short "g", barely releasing air: "dóg".','dug',DOG),
+    pic('cat','quét','gato','Um gato cinza rajado, com olhos verdes, focinho branco e bigodes.','A gray tabby cat with green eyes, a white muzzle and whiskers.','O "a" fica entre "é" e "a", e o "t" final é leve: "quét".','The "a" sits between "eh" and "ah", and the final "t" is light: "quét".','cut',CAT),
+    pic('fish','fích','peixe','Um peixe dourado laranja com escamas, nadando na água azul.','An orange goldfish with scales, swimming in blue water.','O "i" é curto e o "sh" final é um "ch" suave, como pedir silêncio: "fích".','The "i" is short and the final "sh" is a soft "ch", like asking for quiet: "fích".','fees',FISH)
+  ];
+  function lev(a,b){var m=a.length,n=b.length,d=[],i,j;for(i=0;i<=m;i++){d[i]=[i]}for(j=1;j<=n;j++)d[0][j]=j;for(i=1;i<=m;i++)for(j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+  function simScore(heard,target){
+    heard=heard.toLowerCase().replace(/[^a-z ]/g,'').trim();if(!heard)return 0;
+    if(heard.split(' ').indexOf(target)>=0)return 96;
+    return Math.max(0,100-Math.round(lev(heard,target)/Math.max(heard.length,target.length)*100));
+  }
+  function listen(p,cb){
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition, fin=false;
+    function done(r){if(fin)return;fin=true;cb(r)}
+    function fake(){var sc=62+Math.floor(Math.random()*36);done({heard:sc>=85?p.w:p.mis,score:sc,sim:true})}
+    if(!SR){setTimeout(fake,900);return}
+    try{
+      var r=new SR();r.lang='en-US';r.maxAlternatives=5;r.interimResults=false;
+      r.onresult=function(e){var best={heard:'',score:-1};for(var i=0;i<e.results[0].length;i++){var h=e.results[0][i].transcript,s=simScore(h,p.w);if(s>best.score)best={heard:h,score:s}}done(best)};
+      r.onerror=function(){fake()};
+      r.onnomatch=function(){done({heard:'',score:0})};
+      r.onend=function(){if(!fin)done({heard:'',score:0})};
+      r.start();
+    }catch(x){fake()}
+  }
+  function picSet(){return PIC.slice(0,S.level==='zero'?6:12)}
+  function has(k){return !!PR.needs[k]}
+  function ptLang(){return S.lang==='pt'?'pt-BR':'en-US'}
+  var SCN=[
+    {id:'greet',lv:'zero',ic:'chat',pt:'Primeiros cumprimentos',en:'First greetings',dp:'Diga seu nome e como você está',de:'Say your name and how you are',steps:[
+      {a:'Hello! What is your name?',p:'Olá! Qual é o seu nome?',h:['My name is Bia.','I am Bia.']},
+      {a:'Nice to meet you! How are you?',p:'Prazer em conhecer você! Como você está?',h:['I am fine, thank you.','I am good.']},
+      {a:'Great! See you tomorrow!',p:'Ótimo! Até amanhã!',h:['Goodbye!','See you!']}]},
+    {id:'market',lv:'ini',ic:'cart',pt:'No mercado',en:'At the market',dp:'Compre frutas e legumes',de:'Buy fruit and vegetables',steps:[
+      {a:'Hello! Welcome to the market. What would you like today?',p:'Olá! Bem-vindo ao mercado. O que você gostaria hoje?',h:['I would like two kilos of tomatoes, please.','Do you have bananas?']},
+      {a:'Sure! Two kilos of tomatoes. Anything else?',p:'Claro! Dois quilos de tomate. Mais alguma coisa?',h:['No, thank you. How much is it?','Yes, I want some onions.']},
+      {a:'That is eight reais. Do you want a bag?',p:'São oito reais. Você quer uma sacola?',h:['Yes, please.','No, thank you.']}]},
+    {id:'clinic',lv:'ini',ic:'cross',pt:'No posto de saúde',en:'At the health clinic',dp:'Cadastro e atendimento',de:'Check-in and appointment',steps:[
+      {a:'Good morning. What is your name and date of birth?',p:'Bom dia. Qual é o seu nome e data de nascimento?',h:['My name is Bia. I was born in 2001.','My name is Ana.']},
+      {a:'How can I help you today?',p:'Como posso ajudar hoje?',h:['I have a headache since yesterday.','I need an appointment, please.']},
+      {a:'Please wait here. The doctor will call you.',p:'Aguarde aqui. O médico vai chamar você.',h:['Thank you very much.','How long is the wait?']}]},
+    {id:'job',lv:'mid',ic:'brief',pt:'Entrevista de emprego',en:'Job interview',dp:'Apresente-se e fale dos seus pontos fortes',de:'Introduce yourself and your strengths',steps:[
+      {a:'Tell me about yourself.',p:'Fale sobre você.',h:['I am a student and I like technology.','My name is Bia and I study Information Systems.']},
+      {a:'Why do you want this job?',p:'Por que você quer este emprego?',h:['I want to learn and grow.','Because I like to help people.']},
+      {a:'What is your biggest strength?',p:'Qual é o seu maior ponto forte?',h:['I am responsible and I learn fast.','I work well in a team.']}]},
+    {id:'debate',lv:'adv',ic:'chat',pt:'Debate: celular na aula',en:'Debate: phones in class',dp:'Defenda sua opinião',de:'Defend your opinion',steps:[
+      {a:'Should students use phones in class?',p:'Os alunos devem usar celular na aula?',h:['I think phones can help learning.','I disagree, phones distract students.']},
+      {a:'Interesting. Can you give one example?',p:'Interessante. Você pode dar um exemplo?',h:['For example, students can use dictionaries.','For example, notifications interrupt the class.']},
+      {a:'Good point. What is your final opinion?',p:'Bom argumento. Qual é a sua opinião final?',h:['I agree with limited use.','I believe rules are important.']}]}
+  ];
+  var FIX=[
+    [/\bi have (\d+) years?( old)?\b/i,function(m){return 'I am '+m[1]+' years old'},['Em inglês, idade usa "to be" (I am), não "to have".','In English, age uses "to be" (I am), not "to have".']],
+    [/\bmy name (are|be|is called)\b/i,function(){return 'My name is'},['A forma correta é "My name is".','The correct form is "My name is".']],
+    [/\bi am agree\b/i,function(){return 'I agree'},['"Agree" já é verbo: diga "I agree".','"Agree" is already a verb: say "I agree".']],
+    [/\bi (am|'m) live\b/i,function(){return 'I live'},['Use "I live", sem "am".','Use "I live", without "am".']],
+    [/\bi want (learn|grow)\b/i,function(m){return 'I want to '+m[1]},['Depois de "want", use "to" + verbo.','After "want", use "to" + verb.']],
+    [/\bi (like|want) help\b/i,function(m){return 'I '+m[1]+' to help'},['Use "to" antes do verbo.','Use "to" before the verb.']],
+    [/\bmore cheap\b/i,function(){return 'cheaper'},['Adjetivo curto: cheap → cheaper.','Short adjective: cheap → cheaper.']]
+  ];
+  function analyze(text){
+    for(var i=0;i<FIX.length;i++){var m=text.match(FIX[i][0]);if(m)return {fix:text.replace(FIX[i][0],FIX[i][1](m)),note:FIX[i][2]}}
+    if(/(^|\s)i(\s|,|\.|!|\?|$)/.test(text))return {fix:text.replace(/(^|\s)i(?=\s|,|\.|!|\?|$)/g,'$1I'),note:['O pronome "I" é sempre maiúsculo.','The pronoun "I" is always capitalized.']};
+    return null;
+  }
+  function wrapWords(t){
+    return esc(t).replace(/([A-Za-z']+)/g,function(w){var k=w.toLowerCase();return DICT[k]?'<button class="w" data-a="word" data-v="'+k+'">'+w+'</button>':w});
+  }
+  var focusTimer=null, timer=null, callTimer=null, packTimer=null, toastT=null;
+  var app=document.getElementById('app');
+
+  function tr(p,e){return S.lang==='pt'?p:e}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  var P={
+    home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+    chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+    mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+    trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4v2a3 3 0 0 0 4 3M16 6h4v2a3 3 0 0 1-4 3M12 13v4M8 21h8M10 17h4"/>',
+    phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+    book:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/>',
+    send:'<path d="M4 12l16-8-6 16-2.5-6.5z"/>',
+    play:'<path d="M7 4l13 8-13 8z" fill="currentColor"/>',
+    back:'<path d="M15 5l-7 7 7 7"/>',
+    check:'<path d="M5 12l5 5 9-10"/>',
+    off:'<path d="M2 8a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0M12 19h.01M3 3l18 18"/>',
+    users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>',
+    pen:'<path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3"/>',
+    down:'<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',
+    swap:'<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+    spark:'<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
+    cards:'<rect x="3" y="7" width="13" height="12" rx="2"/><path d="M8 4h13v12"/>',
+    tr:'<path d="M4 5h9M8 3v2M6 9c1 3 3 5 6 6M12 5c-1 5-4 8-8 10M13 20l4-9 4 9M14.5 17h5"/>',
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>',
+    speaker:'<path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',
+    cart:'<path d="M3 4h2l2 11h11l2-8H6M9 20h.01M17 20h.01"/>',
+    cross:'<path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/>',
+    brief:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M3 13h18"/>',
+    star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'
+  };
+  function ico(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>'}
+  function av(name,i){return '<div class="av" style="background:'+colors[(name.charCodeAt(0)+i)%colors.length]+'" aria-hidden="true">'+esc(name[0])+'</div>'}
+
+  function speak(text,lang,rate){
+    try{
+      if(!window.speechSynthesis){toast(tr('Áudio não disponível neste aparelho.','Audio is not available on this device.'));return}
+      window.speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance(text);u.lang=lang||'en-US';u.rate=rate||.85;window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function toast(m){S.toast=m;clearTimeout(toastT);toastT=setTimeout(function(){S.toast='';render()},2200);render()}
+  function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+
+  var TITLES={
+    home:['Início','Home'],rooms:['Salas','Rooms'],feedback:['Feedback','Feedback'],
+    onb:['Cadastro','Sign up'],profile:['Meu perfil e apoio','My profile and support'],challenges:['Desafios','Challenges'],tutor:['Tutor IA','AI Tutor'],calls:['Chamadas','Calls'],rules:['Regras do grupo','Group rules'],thread:null
+  };
+  var TABS=[['home','home',['Início','Home']],['tutor','spark',['Tutor IA','AI Tutor']],['rooms','chat',['Salas','Rooms']],['feedback','mic',['Feedback','Feedback']],['calls','phone',['Chamadas','Calls']]];
+
+  function wave(){var h=[8,14,20,12,22,10,18,24,12,16,8,20,14,10];return '<div class="wave" aria-hidden="true">'+h.map(function(x){return '<i style="height:'+x+'px"></i>'}).join('')+'</div>'}
+
+  function vRooms(){
+    var rs=[['conv',tr('Conversação','Conversation'),tr('Conversas livres com o grupo','Free chat with the group'),'chat'],['dicas',tr('Dicas e Estudos','Tips and Studies'),tr('Dúvidas, métodos e materiais · pode usar português','Questions, methods and materials · Portuguese allowed'),'book']];
+    return '<div class="list">'+rs.map(function(r,i){
+      var last=S.msgs[r[0]][S.msgs[r[0]].length-1];
+      return '<button class="li" data-a="room" data-v="'+r[0]+'"><div class="ib" style="background:'+colors[i]+';color:#fff">'+ico(r[3])+'</div><div class="grow"><b>'+r[1]+'</b><div class="muted">'+r[2]+'</div><div class="muted" style="margin-top:4px">'+esc(last.w)+': '+(last.a?tr('Áudio','Audio')+' '+last.a:esc(last.t).slice(0,42)+(last.t&&last.t.length>42?'…':''))+'</div></div></button>'
+    }).join('')+'</div>'+
+    '<div class="tip">'+tr('Ninguém é ridicularizado por errar. Corrija com gentileza.','Nobody is mocked for mistakes. Correct kindly.')+'</div>';
+  }
+
+  function vThread(){
+    var arr=S.msgs[S.room];
+    return '<div class="thread">'+arr.map(function(m){
+      var me=m.w==='Bia';
+      var body=m.a?'<div class="audio"><button class="play" data-a="tts" data-v="Hello, this is my practice audio." aria-label="'+tr('Ouvir áudio','Play audio')+'">'+ico('play')+'</button>'+wave()+'<small style="margin:0">'+m.a+'</small></div>':esc(m.t);
+      return '<div class="msg'+(me?' me':'')+'"><small>'+(me?tr('Você','You'):esc(m.w))+(m.q?' · '+tr('na fila','queued'):'')+'</small>'+body+'</div>'
+    }).join('')+'</div>';
+  }
+
+  function vFeedback(){
+    var sp=S.tab==='speak';
+    var h='<div class="seg" role="group"><button data-a="tab" data-v="speak" aria-pressed="'+sp+'">'+tr('Speaking (áudio)','Speaking (audio)')+'</button><button data-a="tab" data-v="write" aria-pressed="'+!sp+'">'+tr('Writing (texto)','Writing (text)')+'</button></div>';
+    if(sp){
+      h+='<div class="card rec"><div class="timer" id="tm">'+fmt(S.sec)+'</div>'+
+      '<button class="recbtn'+(S.rec?' on':'')+'" data-a="rec" aria-label="'+(S.rec?tr('Parar gravação','Stop recording'):tr('Começar a gravar','Start recording'))+'">'+ico('mic')+'</button>'+
+      '<div class="muted" style="text-align:center">'+(S.rec?tr('Gravando… toque para parar','Recording… tap to stop'):tr('Toque e fale em inglês. Até 30 segundos.','Tap and speak English. Up to 30 seconds.'))+'</div>'+
+      (!S.rec&&S.sec>0?'<button class="btn acc full" data-a="sendrec">'+ico('send')+tr('Pedir feedback','Ask for feedback')+'</button>':'')+'</div>';
+      h+=S.spk.map(function(it){return fbCard(it,false)}).join('');
+    } else {
+      h+='<div class="card"><label for="wt" class="h">'+tr('Seu texto em inglês','Your text in English')+'</label><textarea id="wt" placeholder="'+tr('Escreva 2 ou 3 frases…','Write 2 or 3 sentences…')+'">'+esc(S.writeTxt)+'</textarea>'+
+      '<button class="btn acc full" style="margin-top:10px" data-a="sendwrite">'+ico('send')+tr('Pedir correção','Ask for correction')+'</button></div>';
+      h+=S.wri.map(function(it){return fbCard(it,true)}).join('');
+    }
+    return h;
+  }
+  function fbCard(it,w){
+    var st=it.st==='done'?'<span class="pill ok">'+tr('Feedback recebido','Feedback received')+'</span>':(it.q?'<span class="pill warn">'+tr('Vai enviar quando houver internet','Will send when online')+'</span>':'<span class="pill warn">'+tr('Aguardando feedback','Waiting for feedback')+'</span>');
+    var b=w?'<div style="margin:8px 0">'+(it.del||esc(it.orig))+'<br>'+(it.fix||'')+'</div>':'<div class="audio" style="margin:8px 0"><button class="play" data-a="tts" data-v="My name is Bia and I live in Belo Horizonte." aria-label="'+tr('Ouvir','Play')+'">'+ico('play')+'</button>'+wave()+'</div>';
+    return '<div class="card"><div class="row"><div class="grow"><b>'+(w?tr('Texto','Text'):esc(it.title||tr('Meu áudio','My audio')))+'</b></div>'+st+'</div>'+b+
+      (it.note?'<div class="tip"><b>'+esc(it.from)+':</b> '+esc(it.note[S.lang])+'</div>':'')+'</div>';
+  }
+
+  function vChallenges(){
+    return '<div class="list">'+S.ch.map(function(c){
+      return '<div class="card"><div class="ch"><button class="check" data-a="chk" data-v="'+c.id+'" aria-pressed="'+c.done+'" aria-label="'+tr('Marcar como feito','Mark as done')+'">'+ico('check')+'</button>'+
+      '<div><b>'+c[S.lang==='pt'?'pt':'en']+'</b><div class="muted">'+(S.lang==='pt'?c.mp:c.me)+'</div></div><span class="pill'+(c.done?' ok':'')+'">'+(c.done?tr('Feito','Done'):tr('A fazer','To do'))+'</span></div>'+
+      (c.k==='listen'?'<div style="margin-top:8px">'+S.phrases.map(function(p){return '<div class="phr"><span>'+p+'</span><button class="ib acc" style="width:40px;height:40px" data-a="tts" data-v="'+p+'" aria-label="'+tr('Ouvir','Listen')+'">'+ico('play')+'</button></div>'}).join('')+'</div>':'')+'</div>'
+    }).join('')+'</div><div class="tip">'+tr('Sugira um desafio novo para o grupo no espaço Desafios e Atividades.','Suggest a new challenge for the group in the Challenges space.')+'</div>';
+  }
+
+  function vCalls(){
+    var c=S.call, p=S.partners[c.partner];
+    if(c.active){
+      return '<div class="incall"><div class="av" style="background:'+colors[c.partner%5]+';width:72px;height:72px;font-size:28px">'+p[0]+'</div><b style="font-family:var(--display);font-size:20px">'+p+'</b>'+
+      '<div class="timer" id="ct">'+fmt(c.sec)+'</div><div class="pill">'+(c.video?tr('Vídeo','Video'):tr('Só voz · usa menos dados','Voice only · uses less data'))+'</div></div>'+
+      '<div class="card"><b>'+tr('Assunto para começar','Topic to start')+'</b><div style="margin-top:6px">'+S.topics[S.lang][c.sec%3]+'</div></div>'+
+      '<button class="btn acc full" data-a="hang">'+tr('Encerrar chamada','End call')+'</button>';
+    }
+    return '<div class="card"><h3 class="h">'+tr('Praticar agora','Practice now')+'</h3>'+
+    '<div class="row" style="margin:10px 0">'+av(p,0)+'<div class="grow"><b>'+p+'</b><div class="muted">'+tr('Parceiro sugerido · troca a cada rodada','Suggested partner · changes each round')+'</div></div><button class="ib" style="background:var(--surface2);color:var(--ink);border:1px solid var(--line)" data-a="swap" aria-label="'+tr('Trocar parceiro','Change partner')+'">'+ico('swap')+'</button></div>'+
+    '<div class="seg" role="group"><button data-a="video" data-v="0" aria-pressed="'+!c.video+'">'+tr('Só voz','Voice only')+'</button><button data-a="video" data-v="1" aria-pressed="'+c.video+'">'+tr('Vídeo','Video')+'</button></div>'+
+    (S.offline?'<div class="banner off" style="margin-top:10px;border-radius:10px">'+ico('off').replace('<svg','<svg width="18" height="18"')+tr('Sem internet. Use os áudios do Feedback.','No internet. Use audio in Feedback.')+'</div>':'')+
+    '<button class="btn full" style="margin-top:10px" data-a="call" '+(S.offline?'disabled':'')+'>'+ico('phone')+tr('Iniciar chamada','Start call')+'</button></div>'+
+    '<h3 class="h" style="margin:4px 2px 0">'+tr('Chamadas marcadas','Scheduled calls')+'</h3>'+
+    '<div class="list">'+S.calls.map(function(k,i){return '<div class="li"><div class="grow"><b>'+k[S.lang==='pt'?'pt':'en']+'</b><div class="muted">'+k.when[S.lang]+' · '+k.n+' '+tr('pessoas','people')+'</div></div><button class="btn alt" data-a="remind" data-v="'+i+'">'+tr('Lembrar','Remind me')+'</button></div>'}).join('')+'</div>'+
+    '<div class="tip">'+tr('Para quem não pôde ir ao encontro presencial ou quer praticar mais.','For those who could not attend the in-person meeting or want more practice.')+'</div>';
+  }
+
+  function vRules(){
+    var R=[
+      ['Respeito e tolerância zero a ofensas','Respect and zero tolerance for offenses','Sem xingamentos, insultos, ataques pessoais ou qualquer ofensa que desrespeite ou constranja outra pessoa.','No name-calling, insults, personal attacks or any offense that disrespects or embarrasses another person.'],
+      ['Respeito às diferenças','Respect for differences','Respeite nível no idioma, forma de aprender, pronúncia, sotaque, cultura e opiniões.','Respect level, learning style, pronunciation, accent, culture and opinions.'],
+      ['Um ambiente para aprender','A place to learn','Prática, aprendizado e troca de conhecimento. Ninguém é ridicularizado por errar.','Practice, learning and knowledge exchange. Nobody is mocked for making mistakes.'],
+      ['Correções respeitosas','Respectful corrections','Você pode ajudar com pronúncia, gramática e vocabulário, sempre com respeito e para ajudar.','You may help with pronunciation, grammar and vocabulary, always respectfully and to help.'],
+      ['Português para dúvidas','Portuguese for questions','O inglês não é obrigatório o tempo todo. Use português para dúvidas, gramática, métodos e para ajudar iniciantes.','English is not required all the time. Use Portuguese for questions, grammar, methods and to help beginners.'],
+      ['Prática de conversação','Conversation practice','Momentos dedicados a conversar no idioma e desenvolver a comunicação.','Moments dedicated to speaking the language and building communication.'],
+      ['Conflitos entre participantes','Conflicts between participants','Resolva de forma pacífica e privada, sem levar conflitos pessoais para o grupo.','Resolve peacefully and privately, without bringing personal conflicts to the group.'],
+      ['Privacidade','Privacy','Preserve a privacidade. Não exponha conversas ou situações particulares desnecessariamente.','Protect privacy. Do not expose private conversations or situations unnecessarily.']
+    ];
+    return '<div class="card"><h3 class="h">'+tr('Sobre o projeto','About the project')+'</h3><div class="muted">'+tr('A ideia é da Pricilla Braga: reunir um grupo de estudantes para estudar juntos e trocar conhecimento. O grupo foi melhorando em conversa, escreveu as regras e decidiu transformar isso neste app. Participam, por enquanto: Davi Alves, Glendha Paulino, Pricilla Braga e Welberthy Gustavo de Freitas Morais.','The idea is Pricilla Braga\'s: bring a group of students together to study and exchange knowledge. The group improved through conversation, wrote the rules and decided to turn it into this app. Current members: Davi Alves, Glendha Paulino, Pricilla Braga and Welberthy Gustavo de Freitas Morais.')+'</div></div>'+
+    '<div class="tip">'+tr('Todos podem praticar, aprender, ajudar e ser ajudados.','Everyone can practice, learn, help and be helped.')+'</div>'+
+    R.map(function(r,i){var o=S.rules===i+1;return '<div class="rule"><button data-a="rule" data-v="'+(i+1)+'" aria-expanded="'+o+'"><span class="n">'+(i+1)+'</span><span class="grow">'+r[S.lang==='pt'?0:1]+'</span></button>'+(o?'<p>'+r[S.lang==='pt'?2:3]+'</p>':'')+'</div>'}).join('');
+  }
+
+  function vTalk(){
+    var T=S.tut, sc=SCN.filter(function(x){return x.id===T.scn})[0], h='<div class="thread">';
+    T.chat.forEach(function(m,ix){
+      if(m.r==='ai'||m.r==='end'){
+        var txt=m.r==='end'?'Great job! That was a good conversation.':sc.steps[m.i].a, pt=m.r==='end'?'Muito bem! Foi uma boa conversa.':sc.steps[m.i].p, k='k'+ix;
+        h+='<div class="msg ai"><small>'+tr('Tutor IA','AI Tutor')+'</small>'+wrapWords(txt)+(T.tips[k]?'<div class="muted" style="margin-top:6px;font-style:italic">'+esc(pt)+'</div>':'')+
+        '<div class="tools"><button class="mini" data-a="tts" data-v="'+esc(txt)+'">'+ico('play')+tr('Ouvir','Listen')+'</button><button class="mini" data-a="trans" data-v="'+k+'">'+ico('tr')+tr('Traduzir','Translate')+'</button></div></div>';
+      } else {
+        h+='<div class="msg me"><small>'+tr('Você','You')+(m.mic?' · '+tr('por voz','by voice'):'')+'</small>'+esc(m.t)+'</div>';
+        if(m.fix)h+='<div class="fix"><del>'+esc(m.t)+'</del> <ins>'+esc(m.fix)+'</ins><br>'+esc(m.note[S.lang==='pt'?0:1])+'</div>';
+        else h+='<div class="fix good">'+tr('Perfeito! Sem correções.','Perfect! No corrections.')+'</div>';
+        if(m.mic)h+='<div class="fix"><span class="score">'+tr('Pronúncia','Pronunciation')+': <b>'+m.score+'%</b> · '+tr('treine','practice')+' "<b>'+esc(m.weak)+'</b>"</span> <button class="mini" style="margin-left:6px" data-a="tts" data-v="'+esc(m.weak)+'">'+ico('play')+'</button></div>';
+      }
+    });
+    h+='</div>';
+    if(T.done){
+      h+='<div class="card" style="text-align:center"><div style="color:var(--accent)">'+ico('star').replace('<svg','<svg width="32" height="32"')+'</div><h3 class="h">'+tr('Conversa concluída!','Conversation complete!')+'</h3><div class="muted">+'+(T.steps*10+20)+' XP · '+T.fixes+' '+(T.fixes===1?tr('correção','correction'):tr('correções','corrections'))+'</div>'+
+      '<div class="row" style="margin-top:12px"><button class="btn alt grow" data-a="tview" data-v="vocab">'+ico('cards')+tr('Vocabulário','Vocabulary')+'</button><button class="btn grow" data-a="tnew">'+tr('Novo cenário','New scenario')+'</button></div></div>';
+    } else {
+      h+='<div class="chips"><div class="muted" style="font-weight:700">'+tr('Toque para responder ou escreva com suas palavras:','Tap to reply or write your own:')+'</div>'+sc.steps[T.step].h.map(function(x,i){return '<button class="sug" data-a="tsug" data-v="'+i+'">'+esc(x)+'</button>'}).join('')+'</div>';
+    }
+    return h;
+  }
+  function vTComposer(){
+    return '<div class="composer"><label class="sr" for="ti">'+tr('Sua resposta','Your reply')+'</label><input id="ti" placeholder="'+tr('Responda em inglês…','Reply in English…')+'" value="'+esc(S.tut.draft)+'" autocomplete="off" '+(S.tut.done?'disabled':'')+'>'+
+    '<button class="ib acc" data-a="tmic" aria-label="'+tr('Responder por voz','Reply by voice')+'" '+(S.tut.done?'disabled':'')+'>'+ico('mic')+'</button><button class="ib" data-a="tsend" aria-label="'+tr('Enviar','Send')+'" '+(S.tut.done?'disabled':'')+'>'+ico('send')+'</button></div>';
+  }
+  function lvName(){return {zero:tr('Nível 0','Level 0'),ini:tr('Iniciante','Beginner'),mid:tr('Interm.','Interm.'),adv:tr('Avançado','Advanced')}}
+  function needBtn(n){
+    var on=!!PR.needs[n[0]];
+    return '<button class="opt" data-a="need" data-v="'+n[0]+'" aria-pressed="'+on+'"><span class="box">'+(on?ico('check'):'')+'</span><span class="grow"><b>'+tr(n[1],n[2])+'</b><span class="muted" style="display:block">'+tr(n[3],n[4])+'</span></span></button>';
+  }
+  function lvBtn(k,dp,de){
+    return '<button class="opt" data-a="level" data-v="'+k+'" aria-pressed="'+(S.level===k)+'"><span class="box">'+(S.level===k?ico('check'):'')+'</span><span class="grow"><b>'+lvName()[k]+'</b><span class="muted" style="display:block">'+tr(dp,de)+'</span></span></button>';
+  }
+  function vOnb(){
+    var st=PR.step, N=4, h='';
+    h+='<div class="dots" role="progressbar" aria-valuemin="1" aria-valuemax="'+N+'" aria-valuenow="'+(st+1)+'" aria-label="'+tr('Passo','Step')+' '+(st+1)+' '+tr('de','of')+' '+N+'">'+[0,1,2,3].map(function(i){return '<i class="'+(i<=st?'on':'')+'"></i>'}).join('')+'<span class="muted">'+tr('Passo','Step')+' '+(st+1)+' '+tr('de','of')+' '+N+'</span></div>';
+    if(st===0){
+      h+='<div class="card hello"><h3 class="h">'+tr('Bem-vindo ao Rolê da Fala!','Welcome to Rolê da Fala!')+'</h3><div class="muted">'+tr('Vamos configurar o app para você aprender do seu jeito. Leva 2 minutos.','Let\'s set up the app so you can learn your way. It takes 2 minutes.')+'</div></div>'+
+      '<div class="field"><label for="nm">'+tr('Como você quer ser chamado(a)?','What should we call you?')+'</label><input id="nm" value="'+esc(PR.name)+'" autocomplete="off" placeholder="'+tr('Seu nome ou apelido','Your name or nickname')+'"></div>'+
+      '<button class="btn acc full" data-a="voicemode">'+ico('speaker')+tr('Sou cego(a) ou prefiro voz: ativar modo por voz','I am blind or prefer voice: turn on voice mode')+'</button>';
+    } else if(st===1){
+      h+='<div><h3 class="h">'+tr('Como podemos ajudar você a aprender melhor?','How can we help you learn better?')+'</h3><div class="muted">'+tr('Opcional. Escolha quantas quiser. Só você vê essas respostas e pode mudar a qualquer momento.','Optional. Choose as many as you like. Only you see these answers and you can change them any time.')+'</div></div>'+
+      '<div class="list" role="group" aria-label="'+tr('Preferências de apoio','Support preferences')+'">'+NEEDS.map(needBtn).join('')+'</div>';
+    } else if(st===2){
+      h+='<div><h3 class="h">'+tr('Qual é o seu nível de inglês?','What is your English level?')+'</h3><div class="muted">'+tr('Não sabe? Comece pelo Nível 0. Dá para mudar depois.','Not sure? Start at Level 0. You can change it later.')+'</div></div>'+
+      '<div class="list" role="group">'+lvBtn('zero','Ainda não sei nada ou quase nada. Começamos com figuras e palavras simples.','I know nothing or almost nothing. We start with pictures and simple words.')+lvBtn('ini','Conheço algumas palavras e frases.','I know some words and phrases.')+lvBtn('mid','Consigo conversar sobre assuntos do dia a dia.','I can chat about everyday topics.')+lvBtn('adv','Converso com facilidade e quero refinar.','I chat easily and want to refine.')+'</div>';
+    } else {
+      var act=NEEDS.filter(function(n){return PR.needs[n[0]]&&n[0]!=='none'});
+      h+='<div class="card hello"><h3 class="h">'+tr('Tudo pronto','All set')+(PR.name?', '+esc(PR.name):'')+'!</h3><div class="muted">'+tr('Nível inicial:','Starting level:')+' <b>'+lvName()[S.level]+'</b></div></div>'+
+      '<div class="card"><h3 class="h">'+tr('O que vamos ajustar','What we will adjust')+'</h3>'+(act.length?'<ul style="margin:6px 0 0;padding-left:18px">'+act.map(function(n){return '<li><b>'+tr(n[1],n[2])+':</b> '+tr(n[3],n[4])+'</li>'}).join('')+'</ul>':'<div class="muted">'+tr('Nenhum ajuste especial. Você pode ativar quando quiser em Meu perfil.','No special adjustments. You can turn them on any time in My profile.')+'</div>')+'</div>'+
+      '<div class="tip">'+tr('Neste protótipo, nada sai do seu aparelho. No app real, essas respostas só serão guardadas com a sua autorização.','In this prototype nothing leaves your device. In the real app these answers will only be saved with your permission.')+'</div>';
+    }
+    h+='<div class="row" style="margin-top:4px">'+(st>0?'<button class="btn alt grow" data-a="oback">'+tr('Voltar','Back')+'</button>':'')+'<button class="btn grow" data-a="onext">'+(st===3?tr('Entrar no app','Enter the app'):tr('Continuar','Continue'))+'</button></div>';
+    if(st===0)h+='<button class="btn alt full" data-a="oskip">'+tr('Pular cadastro (demonstração)','Skip sign-up (demo)')+'</button>';
+    return h;
+  }
+  function vProfile(){
+    return '<div class="card"><h3 class="h">'+(PR.name||tr('Aluno','Student'))+'</h3><div class="muted">'+tr('Nível:','Level:')+' <b>'+lvName()[S.level]+'</b></div></div>'+
+    '<div><h3 class="h">'+tr('Preferências de apoio','Support preferences')+'</h3><div class="muted">'+tr('As mudanças valem na hora.','Changes apply instantly.')+'</div></div>'+
+    '<div class="list">'+NEEDS.map(needBtn).join('')+'</div>'+
+    '<div class="row"><button class="btn alt grow" data-a="redo">'+tr('Refazer cadastro','Redo sign-up')+'</button></div>'+
+    '<div class="tip">'+tr('Neste protótipo, nada sai do seu aparelho.','In this prototype nothing leaves your device.')+'</div>';
+  }
+  function picIntro(){var p=picSet()[Math.min(S.pics.i,picSet().length-1)];speak(tr(p.d,p.de)+' '+tr('Diga o nome em inglês.','Say its name in English.'),ptLang())}
+  function vPicsBody(){
+    var set=picSet(), T=S.pics, i=Math.min(T.i,set.length-1), p=set[i], done=Object.keys(T.best).length;
+    var rev=T.rev||S.level==='zero'||has('deaf'), r=T.res;
+    var h='<div class="row"><span class="pill acc">'+tr('Figura','Picture')+' '+(i+1)+' '+tr('de','of')+' '+set.length+'</span><span class="grow"></span><span class="pill ok">'+done+' '+tr('acertos','hits')+'</span></div>'+
+    '<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+set.length+'" aria-valuenow="'+done+'"><i style="width:'+Math.round(done/set.length*100)+'%"></i></div>'+
+    '<div class="pic" role="img" aria-label="'+esc(tr(p.d,p.de))+'">'+p.svg+'</div>'+
+    '<div style="text-align:center"><div class="muted">'+tr('Em português:','In Portuguese:')+' <b>'+esc(p.pt)+'</b></div>'+
+    (rev?'<div class="bigword">'+p.w+'</div><div class="muted">'+tr('soa como','sounds like')+' "<b>'+p.ph+'</b>"</div>':'<h3 class="h" style="margin-top:8px">'+tr('Como se diz em inglês?','How do you say it in English?')+'</h3><button class="btn alt" style="margin-top:6px" data-a="preveal">'+tr('Mostrar dica','Show hint')+'</button>')+'</div>';
+    if(!has('deaf'))h+='<div class="row"><button class="btn alt grow" data-a="pplay" data-v="0.85">'+ico('play')+tr('Ouvir','Listen')+'</button><button class="btn alt grow" data-a="pplay" data-v="0.55">'+ico('play')+tr('Devagar','Slowly')+'</button></div>';
+    h+='<div class="card rec"><button class="recbtn'+(T.busy?' on':'')+'" data-a="pmic" aria-label="'+(T.busy?tr('Ouvindo','Listening'):tr('Falar o nome da figura','Say the picture name'))+'">'+ico('mic')+'</button><div class="muted" style="text-align:center" aria-live="polite">'+(T.busy?tr('Ouvindo… fale agora','Listening… speak now'):tr('Toque e diga o nome em inglês','Tap and say the name in English'))+'</div></div>';
+    if(r){
+      var sc=r.score, col=sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
+      var vd=sc>=85?tr('Muito bem! Pronúncia clara.','Great! Clear pronunciation.'):sc>=60?tr('Quase lá! Veja a dica e tente de novo.','Almost there! Check the tip and try again.'):r.heard?tr('Vamos de novo, com calma. Ouça devagar e repita.','Let\'s try again, calmly. Listen slowly and repeat.'):tr('Não consegui ouvir. Chegue perto do microfone e tente de novo.','I could not hear you. Get closer to the microphone and try again.');
+      h+='<div class="card" role="status"><div class="row"><b class="grow" style="font-family:var(--display);font-size:18px">'+vd+'</b><span class="pill" style="font-size:14px">'+sc+'%</span></div>'+
+      '<div class="bar" style="margin:8px 0"><i style="width:'+sc+'%;background:'+col+'"></i></div>'+
+      (r.heard?'<div class="muted">'+tr('O app ouviu:','The app heard:')+' “<b>'+esc(r.heard)+'</b>”</div>':'')+
+      (sc<85?'<div class="tip" style="margin-top:8px"><b>'+tr('Dica de pronúncia:','Pronunciation tip:')+'</b> '+esc(p.tip[S.lang==='pt'?0:1])+'</div>':'')+
+      (r.sim?'<div class="muted" style="margin-top:8px">'+tr('Modo demonstração: sem microfone neste navegador, a nota é simulada.','Demo mode: no microphone in this browser, the score is simulated.')+'</div>':'')+
+      '<div class="row" style="margin-top:10px"><button class="btn alt grow" data-a="pmic">'+tr('Tentar de novo','Try again')+'</button><button class="btn grow" data-a="pnext">'+tr('Próxima','Next')+'</button></div></div>';
+    } else {
+      h+='<div class="row"><button class="btn alt grow" data-a="pprev">'+tr('Anterior','Previous')+'</button><button class="btn alt grow" data-a="pnext">'+tr('Pular','Skip')+'</button></div>';
+    }
+    return h;
+  }
+  function scnAvail(){return !(S.offline&&S.pack!==2)}
+  function vTutor(){
+    var T=S.tut;
+    var h='<div class="seg s3" role="group"><button data-a="tview" data-v="pics" aria-pressed="'+(T.view==='pics')+'">'+tr('Figuras','Pictures')+'</button><button data-a="tview" data-v="scn" aria-pressed="'+(T.view==='scn')+'">'+tr('Conversas','Chats')+'</button><button data-a="tview" data-v="vocab" aria-pressed="'+(T.view==='vocab')+'">'+tr('Palavras','Words')+' ('+S.vocab.length+')</button></div>';
+    if(T.view==='pics')return h+vPicsBody();
+    if(T.view==='scn'){
+      if(!scnAvail())h+='<div class="banner off" style="border-radius:12px">'+ico('off').replace('<svg','<svg width="18" height="18"')+tr('O tutor precisa de internet ou do pacote offline. Baixe o pacote no Início.','The tutor needs internet or the offline pack. Download the pack on Home.')+'</div>';
+      else if(S.offline)h+='<div class="banner on" style="border-radius:12px">'+tr('Tutor offline: respostas prontas do pacote.','Offline tutor: ready-made replies from the pack.')+'</div>';
+      h+='<div class="tip">'+tr('Converse por voz ou texto. O tutor corrige na hora e dá nota de pronúncia. (Respostas simuladas neste protótipo.)','Chat by voice or text. The tutor corrects instantly and scores pronunciation. (Simulated replies in this prototype.)')+'</div>';
+      var order=SCN.slice().sort(function(a,b){return (b.lv===S.level)-(a.lv===S.level)});
+      h+='<div class="list">'+order.map(function(sc,i){
+        return '<button class="scn" data-a="scn" data-v="'+sc.id+'" '+(scnAvail()?'':'disabled')+'><div class="ib" style="background:'+colors[(i+1)%5]+'">'+ico(sc.ic)+'</div><div class="grow"><b>'+(S.lang==='pt'?sc.pt:sc.en)+'</b><div class="muted">'+(S.lang==='pt'?sc.dp:sc.de)+'</div></div><span class="pill'+(sc.lv===S.level?' acc':'')+'">'+(sc.lv===S.level?tr('Para você','For you'):lvName()[sc.lv])+'</span></button>'}).join('')+'</div>';
+    } else {
+      var v=S.vocab[T.fc%S.vocab.length];
+      h+='<button class="flash" data-a="flip" aria-live="polite"><span class="pill">'+tr('Toque para virar','Tap to flip')+'</span><b>'+(T.flip?esc(v.pt):esc(v.w))+'</b>'+(T.flip?'':'<span style="opacity:.8">'+tr('Como se diz em português?','What does it mean in Portuguese?')+'</span>')+'</button>'+
+      '<div class="row"><button class="btn alt grow" data-a="tts" data-v="'+esc(v.w)+'">'+ico('play')+tr('Ouvir','Listen')+'</button></div>'+
+      '<div class="row"><button class="btn alt grow" data-a="fc" data-v="0">'+tr('Revisar de novo','Review again')+'</button><button class="btn grow" data-a="fc" data-v="1">'+tr('Já sei','I know it')+'</button></div>'+
+      '<div class="list">'+S.vocab.map(function(w){return '<div class="li" style="padding:10px 14px"><div class="grow"><b>'+esc(w.w)+'</b> <span class="muted">· '+esc(w.pt)+'</span></div><span class="pill'+(w.k?' ok':'')+'">'+(w.k?tr('Sei','Known'):tr('Revisar','Review'))+'</span></div>'}).join('')+'</div>'+
+      '<div class="tip">'+tr('Dica: toque nas palavras sublinhadas durante a conversa para salvá-las aqui.','Tip: tap underlined words in a conversation to save them here.')+'</div>';
+    }
+    return h;
+  }
+  var ROUT=[['pics',['Figuras: diga 3 nomes','Pictures: say 3 names']],['scn',['Conversa curta com o tutor','Short chat with the tutor']],['rest',['Descanso','Rest']]];
+  function vHome(){
+    var done=S.ch.filter(function(c){return c.done}).length, off=S.pack===2, ln=lvName();
+    var h='<div class="card hello"><h3 class="h">'+tr('Oi, ','Hi, ')+esc(PR.name||tr('você','there'))+'! '+tr('Vamos praticar?','Ready to practice?')+'</h3>'+
+    '<div class="muted">'+tr('Todo mundo aprende. Errar faz parte.','Everyone learns. Making mistakes is part of it.')+'</div>'+
+    '<div class="levels" role="group" aria-label="'+tr('Seu nível','Your level')+'">'+['zero','ini','mid','adv'].map(function(k){return '<button class="lv" data-a="level" data-v="'+k+'" aria-pressed="'+(S.level===k)+'">'+ln[k]+'</button>'}).join('')+'</div>'+
+    '<div class="row" style="margin-top:10px"><button class="chip" data-a="go" data-v="profile">'+ico('user').replace('<svg','<svg width="16" height="16"')+tr('Meu perfil e apoio','My profile and support')+'</button></div></div>';
+    if(has('adhd')){
+      h+='<div class="card"><h3 class="h">'+tr('Foco de 5 minutos','5-minute focus')+'</h3><div class="row"><div class="timer" id="fm">'+fmt(S.focus.left)+'</div><span class="grow"></span><button class="btn '+(S.focus.run?'alt':'acc')+'" data-a="focus">'+(S.focus.run?tr('Pausar','Pause'):tr('Começar','Start'))+'</button></div>'+
+      '<div class="muted" style="margin:6px 0 10px">'+tr('Uma coisa de cada vez. Depois, uma pausa.','One thing at a time. Then a break.')+'</div><button class="btn full" data-a="gopics">'+ico('mic')+tr('Próxima tarefa: Figuras','Next task: Pictures')+'</button></div>';
+    }
+    if(has('autism')){
+      var nx=S.rout.indexOf(false);
+      h+='<div class="card"><h3 class="h">'+tr('Rotina de hoje','Today\'s routine')+'</h3><div class="list" style="margin-top:8px">'+ROUT.map(function(r,i){return '<button class="opt" data-a="rt" data-v="'+i+'" aria-pressed="'+S.rout[i]+'"><span class="box">'+(S.rout[i]?ico('check'):'')+'</span><span class="grow"><b>'+tr('Passo','Step')+' '+(i+1)+':</b> '+tr(r[1][0],r[1][1])+'</span></button>'}).join('')+'</div>'+
+      '<div class="muted" style="margin-top:8px">'+(nx>=0?tr('Depois deste passo vem: ','After this step comes: ')+tr(ROUT[Math.min(nx+1,2)][1][0],ROUT[Math.min(nx+1,2)][1][1]):tr('Rotina concluída. Bom trabalho!','Routine complete. Good work!'))+'</div></div>';
+    }
+    var compact=has('adhd')&&!S.showAll;
+    if(!compact){
+      h+='<div class="stats"><div class="stat"><b>'+S.streak+'</b><span>'+tr('dias seguidos','day streak')+'</span></div><div class="stat"><b>'+S.xp+'</b><span>XP</span></div><div class="stat"><b>'+S.vocab.length+'</b><span>'+tr('palavras salvas','saved words')+'</span></div></div>'+
+      '<div class="quick">'+
+        '<button class="q" data-a="gopics">'+ico('image')+'<b>'+tr('Figuras','Pictures')+'</b><span>'+tr('Veja, diga o nome e ouça a correção','See, say the name and hear the correction')+'</span></button>'+
+        '<button class="q" data-a="go" data-v="tutor">'+ico('spark')+'<b>'+tr('Tutor IA','AI Tutor')+'</b><span>'+tr('Converse e receba correção na hora','Chat and get instant corrections')+'</span></button>'+
+        '<button class="q" data-a="go" data-v="calls">'+ico('phone')+'<b>'+tr('Praticar em dupla','Practice in pairs')+'</b><span>'+tr('Voz, sem gastar muito','Voice, low data use')+'</span></button>'+
+        '<button class="q" data-a="go" data-v="rooms">'+ico('chat')+'<b>'+tr('Conversar','Chat')+'</b><span>'+tr('Português liberado nas dúvidas','Portuguese is welcome for questions')+'</span></button>'+
+        '<button class="q" data-a="go" data-v="challenges">'+ico('trophy')+'<b>'+tr('Desafios','Challenges')+'</b><span>'+tr('Atividades da semana','This week\'s activities')+'</span></button>'+
+        '<button class="q" data-a="go" data-v="rules">'+ico('book')+'<b>'+tr('Regras','Rules')+'</b><span>'+tr('Respeito e inclusão','Respect and inclusion')+'</span></button>'+
+      '</div>'+
+      '<div class="card"><div class="row"><div class="grow"><h3 class="h">'+tr('Desafios da semana','This week\'s challenges')+'</h3><div class="muted">'+done+' '+tr('de','of')+' '+S.ch.length+' '+tr('concluídos','done')+'</div></div><span class="pill acc">'+ln[S.level]+'</span></div>'+
+      '<div class="bar" style="margin-top:10px" role="progressbar" aria-valuemin="0" aria-valuemax="'+S.ch.length+'" aria-valuenow="'+done+'"><i style="width:'+Math.round(done/S.ch.length*100)+'%"></i></div></div>'+
+      '<div class="card"><div class="row"><div class="grow"><h3 class="h">'+tr('Pacote offline','Offline pack')+'</h3>'+
+      '<div class="muted">'+tr('Frases, áudios e desafios da semana · 8 MB','This week\'s phrases, audio and challenges · 8 MB')+'</div></div>'+(off?'<span class="pill ok">'+tr('Baixado','Saved')+'</span>':'')+'</div>'+
+      (S.pack===1?'<div class="bar" style="margin-top:10px"><i style="width:'+S.packPct+'%"></i></div>':'')+
+      (off?'':'<button class="btn alt full" style="margin-top:10px" data-a="pack" '+(S.pack===1||S.offline?'disabled':'')+'>'+ico('down')+(S.pack===1?tr('Baixando…','Downloading…'):tr('Baixar para usar sem internet','Download to use without internet'))+'</button>')+
+      (S.offline&&!off?'<div class="muted" style="margin-top:8px">'+tr('Conecte-se a um Wi-Fi para baixar.','Connect to Wi-Fi to download.')+'</div>':'')+'</div>'+
+      '<div class="card"><div class="row"><div class="grow"><h3 class="h">'+tr('Próximo encontro presencial','Next in-person meeting')+'</h3><div class="muted">'+tr('Rotação de duplas (exemplo)','Pair rotation (example)')+'</div></div>'+ico('users').replace('<svg','<svg width="26" height="26" style="color:var(--accent)"')+'</div></div>';
+    }
+    if(has('adhd'))h+='<button class="btn alt full" data-a="showall">'+(S.showAll?tr('Mostrar menos','Show less'):tr('Ver todas as atividades','See all activities'))+'</button>';
+    return h;
+  }
+  function speakChip(){return (has('blind')||has('lowvis')||has('dys'))?'<button class="chip" data-a="readscreen" aria-label="'+tr('Ouvir esta tela','Read this screen aloud')+'">'+ico('speaker').replace('<svg','<svg width="16" height="16"')+'</button>':''}
+  function vComposer(){
+    var pl=S.room==='dicas'?tr('Escreva sua dúvida (pode ser em português)','Write your question (Portuguese is fine)'):tr('Write a message…','Write a message…');
+    return '<div class="composer"><label class="sr" for="mi">'+tr('Mensagem','Message')+'</label><input id="mi" placeholder="'+pl+'" value="'+esc(S.draft)+'" autocomplete="off">'+
+    '<button class="ib acc" data-a="voice" aria-label="'+tr('Enviar áudio','Send audio')+'">'+ico('mic')+'</button><button class="ib" data-a="msg" aria-label="'+tr('Enviar','Send')+'">'+ico('send')+'</button></div>';
+  }
+
+  function render(){
+    var scr=S.screen, inThread=scr==='thread'||scr==='talk';
+    var scn0=SCN.filter(function(x){return x.id===S.tut.scn})[0];
+    var title=scr==='talk'?(S.lang==='pt'?scn0.pt:scn0.en):inThread?(S.room==='conv'?tr('Conversação','Conversation'):tr('Dicas e Estudos','Tips and Studies')):TITLES[scr][S.lang==='pt'?0:1];
+    var body=({onb:vOnb,profile:vProfile,home:vHome,rooms:vRooms,tutor:vTutor,talk:vTalk,thread:vThread,feedback:vFeedback,challenges:vChallenges,calls:vCalls,rules:vRules})[scr]();
+    var back=(inThread||scr==='rules'||scr==='profile')?'<button class="back" data-a="back" aria-label="'+tr('Voltar','Back')+'">'+ico('back')+'</button>':'';
+    var ban=scr==='onb'?'':S.offline?'<div class="banner off">'+ico('off').replace('<svg','<svg width="18" height="18"')+tr('Modo offline: o que você enviar fica na fila.','Offline mode: anything you send waits in the queue.')+'</div>':
+      (S.saver?'<div class="banner on">'+tr('Economia de dados ligada · áudios leves','Data saver on · light audio')+'</div>':'');
+    var scrollEl=app.querySelector('main'), keep=scrollEl?scrollEl.scrollTop:0, prevScreen=app.getAttribute('data-s');
+    app.setAttribute('data-s',scr+S.tab);
+    app.className='app'+(has('blind')||has('lowvis')?' big':'')+(has('lowvis')?' hc':'')+(has('dys')?' dys':'')+(has('autism')?' calm':'')+(has('adhd')?' focus':'')+(has('deaf')?' deaf':'');
+    if(has('blind')&&S._ls!==scr){S._ls=scr;speak(title,ptLang())}
+    app.innerHTML=
+      '<div class="top">'+back+'<h2>'+title+'</h2>'+
+      '<button class="chip" data-a="offline" aria-pressed="'+S.offline+'" title="'+tr('Simular sem internet','Simulate no internet')+'">'+ico('off').replace('<svg','<svg width="16" height="16"')+(S.offline?'Offline':'Online')+'</button>'+
+      speakChip()+'<button class="chip" data-a="lang" aria-label="Language">'+(S.lang==='pt'?'PT':'EN')+'</button></div>'+ban+
+      '<main id="main">'+body+'</main>'+(scr==='onb'?'':scr==='talk'?vTComposer():inThread?vComposer():
+      '<nav class="tabs" aria-label="'+tr('Menu','Menu')+'">'+TABS.map(function(t){return '<button class="tab" data-a="go" data-v="'+t[0]+'"'+(S.screen===t[0]?' aria-current="page"':'')+'>'+ico(t[1])+'<span>'+t[2][S.lang==='pt'?0:1]+'</span><i class="dot"></i></button>'}).join('')+'</nav>')+
+      (S.toast?'<div class="toast" role="status">'+esc(S.toast)+'</div>':'');
+    var m=app.querySelector('main');
+    if(m){ if(prevScreen===scr+S.tab) m.scrollTop=keep; else m.scrollTop=0; if(inThread&&prevScreen!==scr+S.tab) m.scrollTop=m.scrollHeight;
+      if(scr==='talk'&&S._cl!==S.tut.chat.length){m.scrollTop=m.scrollHeight} S._cl=S.tut.chat.length }
+  }
+
+  function addMsg(o){
+    if(S.offline) o.q=true;
+    S.msgs[S.room].push(o);
+  }
+
+  app.addEventListener('input',function(e){
+    if(e.target.id==='mi')S.draft=e.target.value;
+    if(e.target.id==='wt')S.writeTxt=e.target.value;
+    if(e.target.id==='ti')S.tut.draft=e.target.value;
+    if(e.target.id==='nm')PR.name=e.target.value;
+  });
+  app.addEventListener('keydown',function(e){
+    if(e.target.id==='mi'&&e.key==='Enter'){e.preventDefault();act('msg')}
+    if(e.target.id==='ti'&&e.key==='Enter'){e.preventDefault();act('tsend')}
+  });
+  app.addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]'); if(!b||b.disabled)return;
+    act(b.getAttribute('data-a'),b.getAttribute('data-v'));
+  });
+
+  function act(a,v){
+    if(a==='lang'){S.lang=S.lang==='pt'?'en':'pt';render()}
+    else if(a==='offline'){S.offline=!S.offline;
+      if(!S.offline){['conv','dicas'].forEach(function(k){S.msgs[k].forEach(function(m){delete m.q})});S.spk.forEach(function(x){delete x.q});S.wri.forEach(function(x){delete x.q})}
+      toast(S.offline?tr('Sem internet (simulado)','No internet (simulated)'):tr('Internet voltou. Fila enviada!','Back online. Queue sent!'))}
+    else if(a==='go'){S.screen=v;S.room=null;render()}
+    else if(a==='back'){S.screen=S.screen==='thread'?'rooms':S.screen==='talk'?'tutor':'home';S.room=null;render()}
+    else if(a==='level'){S.level=v;render()}
+    else if(a==='room'){S.room=v;S.screen='thread';render()}
+    else if(a==='msg'){var t=S.draft.trim();if(!t){toast(tr('Escreva algo primeiro.','Write something first.'));return}addMsg({w:'Bia',t:t});S.draft='';render();var mm=app.querySelector('main');if(mm)mm.scrollTop=mm.scrollHeight}
+    else if(a==='voice'){addMsg({w:'Bia',a:'0:0'+(3+Math.floor(Math.random()*6))});render();var m2=app.querySelector('main');if(m2)m2.scrollTop=m2.scrollHeight}
+    else if(a==='tts'){speak(v)}
+    else if(a==='tab'){S.tab=v;render()}
+    else if(a==='rec'){
+      if(!S.rec){S.rec=true;S.sec=0;timer=setInterval(function(){S.sec++;var t=document.getElementById('tm');if(t)t.textContent=fmt(S.sec);if(S.sec>=30)act('rec')},1000);render()}
+      else{S.rec=false;clearInterval(timer);render()}
+    }
+    else if(a==='sendrec'){S.spk.unshift({title:tr('Meu áudio novo','My new audio')+' ('+fmt(S.sec)+')',from:'',st:'wait',q:S.offline});S.sec=0;toast(S.offline?tr('Guardado na fila.','Saved in queue.'):tr('Enviado! Alguém do grupo vai responder.','Sent! Someone from the group will reply.'));}
+    else if(a==='sendwrite'){var w=S.writeTxt.trim();if(!w){toast(tr('Escreva seu texto primeiro.','Write your text first.'));return}S.wri.unshift({orig:w,st:'wait',q:S.offline});S.writeTxt='';toast(S.offline?tr('Guardado na fila.','Saved in queue.'):tr('Enviado para correção!','Sent for correction!'))}
+    else if(a==='chk'){S.ch.forEach(function(c){if(String(c.id)===v)c.done=!c.done});render()}
+    else if(a==='swap'){S.call.partner=(S.call.partner+1)%S.partners.length;render()}
+    else if(a==='video'){S.call.video=v==='1';render()}
+    else if(a==='call'){S.call.active=true;S.call.sec=0;callTimer=setInterval(function(){S.call.sec++;var t=document.getElementById('ct');if(t)t.textContent=fmt(S.call.sec)},1000);render()}
+    else if(a==='hang'){S.call.active=false;clearInterval(callTimer);S.call.partner=(S.call.partner+1)%S.partners.length;toast(tr('Boa prática! Próxima rodada com outra pessoa.','Great practice! Next round with someone new.'))}
+    else if(a==='remind'){toast(tr('Lembrete criado.','Reminder set.'))}
+    else if(a==='rule'){S.rules=S.rules===+v?0:+v;render()}
+    else if(a==='need'){
+      if(v==='none'){PR.needs={none:true}}
+      else{delete PR.needs.none;if(PR.needs[v])delete PR.needs[v];else PR.needs[v]=true}
+      render();
+      if(v==='blind'&&PR.needs.blind)speak('Modo por voz ativado. Vou ler o nome de cada tela.','pt-BR');
+    }
+    else if(a==='voicemode'){delete PR.needs.none;PR.needs.blind=true;PR.step=1;render();speak('Modo por voz ativado. Vou ler cada tela em voz alta. Passo 2: escolha suas preferências de apoio.','pt-BR')}
+    else if(a==='oback'){PR.step=Math.max(0,PR.step-1);render()}
+    else if(a==='onext'){
+      if(PR.step<3){PR.step++;render()}
+      else{PR.done=true;S.screen='home';S.tut.view=S.level==='zero'?'pics':'scn';render();toast(tr('Tudo pronto! Bom estudo.','All set! Happy studying.'))}
+    }
+    else if(a==='oskip'){PR.done=true;S.screen='home';render()}
+    else if(a==='redo'){PR.step=0;S.screen='onb';render()}
+    else if(a==='gopics'){S.tut.view='pics';S.screen='tutor';render();if(has('blind'))picIntro()}
+    else if(a==='preveal'){S.pics.rev=true;render()}
+    else if(a==='pplay'){var pp=picSet()[Math.min(S.pics.i,picSet().length-1)];speak(pp.w,'en-US',parseFloat(v))}
+    else if(a==='pmic'){
+      var T2=S.pics;if(T2.busy)return;
+      var p2=picSet()[Math.min(T2.i,picSet().length-1)];
+      T2.busy=true;T2.res=null;render();
+      listen(p2,function(r){
+        T2.busy=false;T2.res=r;T2.rev=true;
+        if(r.score>=60){if(!T2.best[p2.w])S.xp+=5;T2.best[p2.w]=Math.max(T2.best[p2.w]||0,r.score)}
+        render();
+        if(has('blind'))speak((r.score>=85?'Muito bem!':r.score>=60?'Quase lá. Tente de novo.':'Vamos tentar de novo.')+' Sua nota foi '+r.score+' por cento.','pt-BR');
+      });
+    }
+    else if(a==='pnext'||a==='pprev'){var n2=picSet().length;S.pics.i=(S.pics.i+(a==='pnext'?1:n2-1))%n2;S.pics.res=null;S.pics.rev=false;render();if(has('blind'))picIntro()}
+    else if(a==='readscreen'){var mm2=app.querySelector('main');if(mm2)speak(mm2.innerText.replace(/\s+/g,' ').slice(0,1200),ptLang(),.9)}
+    else if(a==='focus'){
+      if(S.focus.run){clearInterval(focusTimer);S.focus.run=false}
+      else{S.focus.run=true;focusTimer=setInterval(function(){S.focus.left--;var e=document.getElementById('fm');if(e)e.textContent=fmt(S.focus.left);if(S.focus.left<=0){clearInterval(focusTimer);S.focus.run=false;S.focus.left=300;toast(tr('Boa! Hora de uma pausa de 2 minutos.','Well done! Time for a 2-minute break.'))}},1000)}
+      render();
+    }
+    else if(a==='rt'){S.rout[+v]=!S.rout[+v];render()}
+    else if(a==='showall'){S.showAll=!S.showAll;render()}
+    else if(a==='tview'){S.tut.view=v;S.screen='tutor';render()}
+    else if(a==='scn'){var sc=SCN.filter(function(x){return x.id===v})[0];var T=S.tut;T.scn=v;T.chat=[{r:'ai',i:0}];T.step=0;T.steps=sc.steps.length;T.done=false;T.fixes=0;T.tips={};T.draft='';S.screen='talk';render();setTimeout(function(){speak(sc.steps[0].a)},200)}
+    else if(a==='tnew'){S.tut.view='scn';S.screen='tutor';render()}
+    else if(a==='tsug'){var sc2=SCN.filter(function(x){return x.id===S.tut.scn})[0];tutorSend(sc2.steps[S.tut.step].h[+v],false)}
+    else if(a==='tsend'){var t2=S.tut.draft.trim();if(!t2){toast(tr('Escreva ou grave sua resposta.','Write or record your reply.'));return}tutorSend(t2,false)}
+    else if(a==='tmic'){var sc3=SCN.filter(function(x){return x.id===S.tut.scn})[0];tutorSend(sc3.steps[S.tut.step].h[0],true)}
+    else if(a==='trans'){S.tut.tips[v]=!S.tut.tips[v];render()}
+    else if(a==='word'){var ex=S.vocab.some(function(x){return x.w===v});if(!ex)S.vocab.push({w:v,pt:DICT[v],k:false});speak(v);toast((ex?tr('Já está salva: ','Already saved: '):tr('Palavra salva: ','Word saved: '))+v+' = '+DICT[v])}
+    else if(a==='flip'){S.tut.flip=!S.tut.flip;render()}
+    else if(a==='fc'){var cur=S.vocab[S.tut.fc%S.vocab.length];cur.k=v==='1';S.tut.fc=(S.tut.fc+1)%S.vocab.length;S.tut.flip=false;S.xp+=2;render()}
+    else if(a==='pack'){S.pack=1;S.packPct=0;packTimer=setInterval(function(){S.packPct+=12;if(S.packPct>=100){clearInterval(packTimer);S.pack=2;toast(tr('Pronto! Funciona sem internet.','Done! Works without internet.'))}else render()},300);render()}
+  }
+
+  function tutorSend(text,mic){
+    var T=S.tut;
+    if(S.offline&&S.pack!==2){toast(tr('Sem internet e sem pacote offline.','No internet and no offline pack.'));return}
+    var sc=SCN.filter(function(x){return x.id===T.scn})[0], an=analyze(text), entry={r:'me',t:text,mic:mic};
+    if(an){entry.fix=an.fix;entry.note=an.note;T.fixes++}
+    if(mic){var words=text.replace(/[^A-Za-z' ]/g,'').split(' ').sort(function(a,b){return b.length-a.length});entry.weak=words[0];entry.score=78+Math.floor(Math.random()*19)}
+    T.chat.push(entry);T.draft='';S.xp+=10;S.mins+=1;T.step++;
+    if(T.step>=sc.steps.length){T.chat.push({r:'end'});T.done=true;S.xp+=20;S.streak=Math.max(S.streak,4)}
+    else T.chat.push({r:'ai',i:T.step});
+    render();
+    var last=T.chat[T.chat.length-1];
+    setTimeout(function(){speak(last.r==='end'?'Great job! That was a good conversation.':sc.steps[last.i].a)},250);
+  }
+  var side={
+    pt:{credit:'Criado por Davi Alves, Glendha Paulino, Pricilla Braga e Welberthy Gustavo de Freitas Morais. A ideia é da Pricilla: reunir estudantes para estudar juntos e trocar conhecimento.',lead:'Protótipo criado por estudantes para praticar idiomas em comunidades e favelas.',list:[
+      ['image','Figuras e pronúncia','Veja a figura, diga o nome em inglês e receba a correção.'],
+      ['ai','Tutor de IA por voz','Converse em cenários do dia a dia, com correção na hora e nota de pronúncia.'],
+      ['pack','Funciona sem internet','Pacote offline e fila de envio: o que você faz sem sinal é enviado quando volta.'],
+      ['mic','Áudio em primeiro lugar','Falar, ouvir e repetir. Pouca digitação e pouca leitura.'],
+      ['phone','Leve e econômico','Chamadas só de voz por padrão e modo de economia de dados.'],
+      ['users','Inclusão de verdade','Cadastro com apoio para cegueira, autismo, dislexia, TDAH e surdez, além do Nível 0 para quem está começando.']]},
+    en:{credit:'Created by Davi Alves, Glendha Paulino, Pricilla Braga and Welberthy Gustavo de Freitas Morais. The idea is Pricilla\'s: bring students together to study and exchange knowledge.',lead:'Prototype created by students to practice languages in communities and favelas.',list:[
+      ['image','Pictures and pronunciation','See the picture, say its name in English and get a correction.'],
+      ['ai','Voice AI tutor','Chat in everyday scenarios with instant correction and a pronunciation score.'],
+      ['pack','Works offline','Offline pack and send queue: what you do without signal is sent when you are back.'],
+      ['mic','Audio first','Speak, listen and repeat. Little typing and little reading.'],
+      ['phone','Light and low-cost','Voice-only calls by default and a data saver mode.'],
+      ['users','Real inclusion','Sign-up with support for blindness, autism, dyslexia, ADHD and deafness, plus Level 0 for beginners.']]}
+  };
+  var iconMap={image:'image',ai:'spark',pack:'down',mic:'mic',phone:'phone',users:'users'};
+  var _render=render;
+  render=function(){
+    _render();
+    var s=side[S.lang];
+    document.querySelector('[data-side="lead"]').textContent=s.lead;
+    document.querySelector('[data-side="credit"]').textContent=s.credit;
+    document.querySelector('[data-side="list"]').innerHTML=s.list.map(function(i){return '<li><div class="ic">'+ico(iconMap[i[0]])+'</div><div><b>'+i[1]+'</b><span>'+i[2]+'</span></div></li>'}).join('');
+  };
+  render();
+})();
+</script>
+
+</body>
+</html>
