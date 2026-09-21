@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Balão de fala simples, na cor --accent do frontend. Só um placeholder:
+  trocar por um ícone de verdade quando o time definir a identidade do app.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#E8702A"
+        android:pathData="M30,34 h48 a10,10 0 0 1 10,10 v22 a10,10 0 0 1 -10,10 h-26 l-12,12 v-12 h-10 a10,10 0 0 1 -10,-10 v-22 a10,10 0 0 1 10,-10 z" />
+</vector>

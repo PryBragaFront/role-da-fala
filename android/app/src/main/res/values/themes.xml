@@ -1,0 +1,4 @@
+<resources>
+    <!-- Tema base para a Activity; o visual de verdade é feito em Compose (ui/theme/Theme.kt). -->
+    <style name="Theme.RoleDaFala" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
