@@ -2,7 +2,13 @@
 
 ## Visão geral
 
-O Rolê da Fala é um protótipo clicável e bilíngue (português e inglês) de um app para praticar idiomas, começando pelo inglês, pensado para uso em comunidades e favelas. Funciona no celular, dá prioridade ao áudio e usa o português como apoio.
+## Introdução
+
+O Rolê da Fala nasceu de uma conversa entre Pricilla Braga e um grupo de amigos. Pricilla conduz, em uma casa de cultura da comunidade, um curso solidário de inglês baseado em conversação, e foi falando dessa experiência que surgiu a pergunta: como levar essa prática para além dos encontros presenciais, para quem não pode estar lá toda semana?
+
+Nos encontros, ficava claro que aprender inglês na comunidade tem desafios próprios. Muita gente quer praticar, mas esbarra em internet cara ou instável, celulares simples, pouco tempo livre e o receio de errar na frente dos outros. Ao mesmo tempo, o formato de conversa, com correção respeitosa e o português sempre disponível para tirar dúvidas, mostrava que é possível aprender sem medo quando o ambiente é acolhedor.
+
+O Rolê da Fala é a tentativa de transformar esse jeito de aprender em um aplicativo. É um protótipo clicável e bilíngue (português e inglês) para praticar idiomas, começando pelo inglês, pensado para uso em comunidades e favelas. Funciona no celular, dá prioridade ao áudio e usa o português como apoio. Pode ser usado no estudo individual, em dupla ou em grupo, em qualquer telefone, com pouco gasto de internet e com recursos de acessibilidade para que ninguém fique de fora.
 
 A ideia inicial é da Pricilla Lopes Braga: reunir estudantes para estudar juntos e trocar conhecimento. O grupo foi melhorando a proposta em conversa, escreveu um documento com as regras de convivência e, a partir dele, decidiu transformar a ideia em um app.
 
